@@ -25,4 +25,12 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --collect:"XPlat Code Coverage" --logger "trx;LogFileName=TestResults.trx" --no-build --verbosity normal
+    - name: Dotnet Test Reporter
+      uses: bibipkins/dotnet-test-reporter@v1.4.1
+      with:
+        github-token: ${{ secrets.TOKEN }}
+        coverage-path: './ControlAcceso.Tests/TestResults/**/coverage.cobertura.xml'
+        coverage-threshold: 80
+        results-path: './ControlAcceso.Tests/TestResults/TestResults.trx'
+        coverage-type: 'cobertura'
