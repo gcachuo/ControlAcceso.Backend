@@ -1,6 +1,6 @@
-namespace ControlAcceso.Backend.Users
+﻿namespace ControlAcceso.Endpoints.Users
 {
-    public class Users
+    public class Request
     {
         public string? Email { get; set; }
 
@@ -17,6 +17,5 @@ namespace ControlAcceso.Backend.Users
         public string? Phone { get; set; }
 
         public string? Address { get; set; }
-
     }
 }

@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using ControlAcceso.Data;
+using ControlAcceso.Services.DBService;
 
 namespace ControlAcceso
 {
@@ -10,8 +12,23 @@ namespace ControlAcceso
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddOpenApi();
+            
+            builder.Services
+                .AddScoped<IDbService, DbService>()
+                .AddScoped<UsersDbContext>();
 
             builder.Services.AddControllers();
+            
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -26,6 +43,8 @@ namespace ControlAcceso
             app.MapGet("/", () => "healthy").WithName("GetHealth");
 
             app.MapControllers();
+            
+            app.UseCors("AllowAllOrigins");
 
             app.Run();
         }
