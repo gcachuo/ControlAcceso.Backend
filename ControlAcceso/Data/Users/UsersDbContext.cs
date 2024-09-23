@@ -1,9 +1,9 @@
 ﻿using ControlAcceso.Data.Model;
 using ControlAcceso.Services.DBService;
 
-namespace ControlAcceso.Data
+namespace ControlAcceso.Data.Users
 {
-    public class UsersDbContext
+    public class UsersDbContext:IUsersDbContext
     {
         private IDbService DbService { get; set; }
 

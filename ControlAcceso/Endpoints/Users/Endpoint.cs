@@ -1,4 +1,4 @@
-﻿using ControlAcceso.Data.Model;
+﻿using ControlAcceso.Data.Users;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +8,11 @@ namespace ControlAcceso.Endpoints.Users
     [Route("users")]
     public class Endpoint : ControllerBase
     {
-        private Data.UsersDbContext? Users { get; }
+        private IUsersDbContext? _users { get; }
         
-        public Endpoint(Data.UsersDbContext? users)
+        public Endpoint(IUsersDbContext? users)
         {
-            Users = users;
+            _users = users;
         }
         
         [HttpPost("register")]
@@ -20,7 +20,7 @@ namespace ControlAcceso.Endpoints.Users
         {
             var hashedPassword=PasswordHasher.HashPassword(request.Password);
             var username = $"{request.FirstName?.ToLower().Replace(" ","")}.{request.FirstSurname?.ToLower().Replace(" ","")}";
-            Users?.InsertUser(new()
+            _users?.InsertUser(new()
             {
                 Username = username,
                 Email = request.Email,

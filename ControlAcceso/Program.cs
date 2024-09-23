@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using ControlAcceso.Data;
+using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
 
 namespace ControlAcceso
