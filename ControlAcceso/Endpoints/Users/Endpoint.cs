@@ -1,4 +1,5 @@
-﻿using ControlAcceso.Data.Users;
+﻿using System.Data;
+using ControlAcceso.Data.Users;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,19 +21,26 @@ namespace ControlAcceso.Endpoints.Users
         {
             var hashedPassword=PasswordHasher.HashPassword(request.Password);
             var username = $"{request.FirstName?.ToLower().Replace(" ","")}.{request.FirstSurname?.ToLower().Replace(" ","")}";
-            _users?.InsertUser(new()
+            try
             {
-                Username = username,
-                Email = request.Email,
-                FirstName = request.FirstName,
-                SecondName = request.SecondName,
-                Lastname = request.FirstSurname,
-                SecondLastname = request.SecondSurname,
-                Password = hashedPassword,
-                PhoneNumber = request.Phone,
-                Address = request.Address
-            });
-            return Ok(new Response { Message = "OK" });
+                _users?.InsertUser(new()
+                {
+                    Username = username,
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    SecondName = request.SecondName,
+                    Lastname = request.FirstSurname,
+                    SecondLastname = request.SecondSurname,
+                    Password = hashedPassword,
+                    PhoneNumber = request.Phone,
+                    Address = request.Address
+                });
+                return Ok(new Response { Message = "OK" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new Response { Message = e.Message });
+            }
         }
 
         [HttpPatch("{idUser}")]
