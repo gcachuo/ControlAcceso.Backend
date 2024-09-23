@@ -2,7 +2,6 @@
 using ControlAcceso.Services.DBService;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Npgsql;
 
 namespace ControlAcceso.Tests.Services
 {

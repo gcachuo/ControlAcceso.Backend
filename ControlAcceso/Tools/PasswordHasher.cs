@@ -4,7 +4,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-class PasswordHasher
+public class PasswordHasher
 {
     // Configuración de los parámetros para el hash
     private const int SaltSize = 16; // Tamaño del salt en bytes
