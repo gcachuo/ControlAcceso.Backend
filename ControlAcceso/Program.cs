@@ -1,6 +1,8 @@
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
+using Npgsql;
 
 namespace ControlAcceso
 {
@@ -14,8 +16,17 @@ namespace ControlAcceso
             builder.Services.AddOpenApi();
             
             builder.Services
-                .AddScoped<IDbService, DbService>()
-                .AddScoped<UsersDbContext>();
+                .AddScoped<IDbConnection, NpgsqlConnection>()
+                .AddScoped<IUsersDbContext, UsersDbContext>();
+            
+            // Inyectar la configuración para obtener el connection string
+            builder.Services.AddTransient<IDbConnection>(sp =>
+            {
+                var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
+                return new NpgsqlConnection(connectionString); // Crear la conexión
+            });
+
+            builder.Services.AddTransient<IDbService, DbService>(); // Registrar DbService
 
             builder.Services.AddControllers();
             
