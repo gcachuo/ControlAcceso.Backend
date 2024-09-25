@@ -46,19 +46,45 @@ namespace ControlAcceso.Endpoints.Users
 
         
         [HttpPatch("{idUser}")]
-        public IActionResult EditUser(string idUser)
+        public IActionResult EditUser(string idUser,[FromBody] Request request)
         {
             try
             {
+                var updateQuery = @"
+                    UPDATE Users
+                    SET email = @Email,
+                        firstname = @FirstName,
+                        second_name = @SecondName,
+                        lastname = @LastName,
+                        second_lastname = @SecondLastname,
+                        password = @Password,
+                        phone_number = @PhoneNumber,
+                        address = @Address
+                    WHERE idUser = @IdUser";
 
-                return Ok(new Response { Message = "OK" });
+                var hashedPassword = PasswordHasher.HashPassword(request.Password);
+
+                var updateParameters = new Dictionary<string, dynamic>
+                {
+                    { "@IdUser", idUser },
+                    { "@Email", request.Email },
+                    { "@FirstName", request.FirstName },
+                    { "@SecondName", request.SecondName },
+                    { "@LastName", request.FirstSurname },
+                    { "@SecondLastname", request.SecondSurname },
+                    { "@Password", hashedPassword },
+                    { "@PhoneNumber", request.Phone },
+                    { "@Address", request.Address }
+                };
+
+                _users?.UpdateUser(updateQuery, updateParameters);
+
+                return Ok(new Response { Message = "Usuario actualizado correctamente" });
             }
             catch (DataException e)
             {
-                
-                throw;
+                return BadRequest(new Response { Message = e.Message });
             }
-
             
         }
     }

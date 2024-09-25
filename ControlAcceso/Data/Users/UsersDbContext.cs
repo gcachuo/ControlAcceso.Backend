@@ -44,5 +44,20 @@ namespace ControlAcceso.Data.Users
                 }
             }
         }
+
+        public void UpdateUser(string updateQuery, Dictionary<string, dynamic> updateParameters)
+        {
+            try
+            {
+                DbService.Update(updateQuery, updateParameters);
+            }
+            catch (PostgresException e)
+            {
+                if (e.Data["SqlState"]?.ToString() == "23505")
+                {
+                    throw new DataException("Error de actualización.");
+                }
+            }
+        }
     }
 }
