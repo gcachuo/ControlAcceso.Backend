@@ -1,4 +1,9 @@
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using ControlAcceso.Data.Roles;
+using ControlAcceso.Data.Users;
+using ControlAcceso.Services.DBService;
+using Npgsql;
 
 namespace ControlAcceso
 {
@@ -10,8 +15,33 @@ namespace ControlAcceso
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddOpenApi();
+            
+            builder.Services
+                .AddScoped<IDbConnection, NpgsqlConnection>()
+                .AddScoped<IUsersDbContext, UsersDbContext>()
+                .AddScoped<IRolesDbContext, RolesDbContext>();
+            
+            // Inyectar la configuración para obtener el connection string
+            builder.Services.AddTransient<IDbConnection>(sp =>
+            {
+                var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
+                return new NpgsqlConnection(connectionString); // Crear la conexión
+            });
+
+            builder.Services.AddTransient<IDbService, DbService>(); // Registrar DbService
 
             builder.Services.AddControllers();
+            
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -26,6 +56,8 @@ namespace ControlAcceso
             app.MapGet("/", () => "healthy").WithName("GetHealth");
 
             app.MapControllers();
+            
+            app.UseCors("AllowAllOrigins");
 
             app.Run();
         }
