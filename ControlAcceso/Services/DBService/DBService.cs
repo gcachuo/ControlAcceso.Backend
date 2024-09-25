@@ -43,6 +43,33 @@ namespace ControlAcceso.Services.DBService
             {
                 _connection.Close(); // Cierra la conexión
             }
+
+        }
+        public void Update(string updateQuery, Dictionary<string, dynamic> updateParameters)
+        {
+            try
+            {
+                _logger.LogInformation(updateQuery);
+
+                _connection.Open();
+                using var command = _connection.CreateCommand();
+                command.CommandText = updateQuery;
+
+                foreach (var parameter in updateParameters)
+                {
+                    var dbParameter = command.CreateParameter();
+                    dbParameter.ParameterName = parameter.Key;
+                    dbParameter.Value = parameter.Value;
+                    command.Parameters.Add(dbParameter);
+                }
+
+                var filasActualizadas = command.ExecuteNonQuery();
+                _logger.LogInformation($"Updated rows: {filasActualizadas}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
     }
 }

@@ -43,10 +43,23 @@ namespace ControlAcceso.Endpoints.Users
             }
         }
 
+
+        
         [HttpPatch("{idUser}")]
         public IActionResult EditUser(string idUser)
         {
-            return Ok(new Response { Message = "OK" });
+            try
+            {
+
+                return Ok(new Response { Message = "OK" });
+            }
+            catch (DataException e)
+            {
+                
+                throw;
+            }
+
+            
         }
     }
 }
