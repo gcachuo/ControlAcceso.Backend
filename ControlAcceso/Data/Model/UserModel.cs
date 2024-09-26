@@ -1,4 +1,6 @@
-﻿namespace ControlAcceso.Data.Model
+﻿using ControlAcceso.Data.Model;
+
+namespace ControlAcceso.Data.Model
 {
     public class UserModel
     {

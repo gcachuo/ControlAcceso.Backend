@@ -2,6 +2,7 @@
 using ControlAcceso.Data.Users;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
+using ControlAcceso.Data.Model;
 
 namespace ControlAcceso.Endpoints.Users
 {
@@ -46,38 +47,28 @@ namespace ControlAcceso.Endpoints.Users
 
         
         [HttpPatch("{idUser}")]
-        public IActionResult EditUser(string idUser,[FromBody] Request request)
+        public IActionResult EditUser(string idUser, [FromBody] Request request)
         {
             try
             {
-                var updateQuery = @"
-                    UPDATE Users
-                    SET email = @Email,
-                        firstname = @FirstName,
-                        second_name = @SecondName,
-                        lastname = @LastName,
-                        second_lastname = @SecondLastname,
-                        password = @Password,
-                        phone_number = @PhoneNumber,
-                        address = @Address
-                    WHERE idUser = @IdUser";
-
+                
                 var hashedPassword = PasswordHasher.HashPassword(request.Password);
 
-                var updateParameters = new Dictionary<string, dynamic>
+                
+                var user = new UserModel
                 {
-                    { "@IdUser", idUser },
-                    { "@Email", request.Email },
-                    { "@FirstName", request.FirstName },
-                    { "@SecondName", request.SecondName },
-                    { "@LastName", request.FirstSurname },
-                    { "@SecondLastname", request.SecondSurname },
-                    { "@Password", hashedPassword },
-                    { "@PhoneNumber", request.Phone },
-                    { "@Address", request.Address }
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    SecondName = request.SecondName,
+                    Lastname = request.FirstSurname,
+                    SecondLastname = request.SecondSurname,
+                    Password = hashedPassword,
+                    PhoneNumber = request.Phone,
+                    Address = request.Address
                 };
 
-                _users?.UpdateUser(updateQuery, updateParameters);
+                
+                _users?.UpdateUser(user, idUser);
 
                 return Ok(new Response { Message = "Usuario actualizado correctamente" });
             }
@@ -85,7 +76,7 @@ namespace ControlAcceso.Endpoints.Users
             {
                 return BadRequest(new Response { Message = e.Message });
             }
-            
         }
+
     }
 }
