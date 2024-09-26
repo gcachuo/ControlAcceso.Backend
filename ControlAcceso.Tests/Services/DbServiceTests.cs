@@ -11,6 +11,7 @@ namespace ControlAcceso.Tests.Services
         private readonly Mock<IDbConnection> _dbConnectionMock=new(MockBehavior.Default);
         private readonly Mock<IDbCommand> _commandMock = new(MockBehavior.Default);
         private readonly Mock<IDataParameterCollection> _parameterMock = new(MockBehavior.Default);
+        private readonly Mock<IDataReader> _readerMock = new(MockBehavior.Default);
 
         [Fact]
         public void Should_Insert_Row_Successfully()
@@ -29,6 +30,25 @@ namespace ControlAcceso.Tests.Services
             _dbConnectionMock.Verify(conn => conn.Open(), Times.Once);
             _dbConnectionMock.Verify(conn => conn.Close(), Times.Once);
             _commandMock.Verify(cmd => cmd.ExecuteNonQuery(), Times.Once);
+        }
+
+        [Fact]
+        public void Should_Select_Row_Successfully()
+        {
+            //Arrange
+            //Mock
+            _dbConnectionMock.Setup(conn => conn.CreateCommand()).Returns(_commandMock.Object);
+            _commandMock.Setup(cmd => cmd.Parameters).Returns(_parameterMock.Object);
+            _commandMock.Setup(cmd => cmd.ExecuteReader()).Returns(_readerMock.Object);
+            
+            //Act
+            var service = new DbService(_loggerMock.Object, _dbConnectionMock.Object);
+            service.ExecuteReader("SELECT * FROM Users;",new());
+
+            //Assert
+            _dbConnectionMock.Verify(conn => conn.Open(), Times.Once);
+            _dbConnectionMock.Verify(conn => conn.Close(), Times.Once);
+            _commandMock.Verify(cmd => cmd.ExecuteReader(), Times.Once);
         }
     }
 }

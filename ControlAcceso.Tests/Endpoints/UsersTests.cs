@@ -49,5 +49,24 @@ namespace ControlAcceso.Tests.Endpoints
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
             (result!.Value as Response)!.Message.Should().Be("Usuario actualizado correctamente");
         }
+        
+        [Fact]
+        public void Should_Get_User_Successfully()
+        {
+            //Arrange
+            const int idUser = 1;
+            var request = new Request(){Password = "123456"};
+
+            //Mock
+            _usersDbContext.Setup(x=>x.SelectUser(idUser)).Returns(new UserModel());
+            
+            //Act
+            var endpoint = new Endpoint(_usersDbContext.Object);
+            var result = endpoint.GetUser(idUser) as ObjectResult;
+
+            //Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
+            (result!.Value as Response)!.Message.Should().Be("OK");
+        }
     }
 }
