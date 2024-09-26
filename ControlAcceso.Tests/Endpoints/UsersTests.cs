@@ -39,6 +39,12 @@ namespace ControlAcceso.Tests.Endpoints
 
             //Mock
             var request = new Request(){Password = "123456"};
+            // Mock setup for UpdateUser
+
+            _usersDbContext.Setup(x => x.UpdateUser(It.IsAny<UserModel>(), It.IsAny<string>()))
+               .Verifiable();  // Verifica que el método fue llamado
+            // Suponiendo que el método UpdateUser retorna un booleano
+
             
             //Act
             var endpoint = new Endpoint(_usersDbContext.Object);
@@ -46,7 +52,11 @@ namespace ControlAcceso.Tests.Endpoints
 
             //Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
-            (result!.Value as Response)!.Message.Should().Be("OK");
+            (result!.Value as Response)!.Message.Should().Be("Usuario actualizado correctamente");
+
+            //Veridica que el mock haya sido llamado
+            _usersDbContext.Verify(x => x.UpdateUser(It.IsAny<UserModel>(), It.IsAny<string>()), Times.Once);
+
         }
     }
 }
