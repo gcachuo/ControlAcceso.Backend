@@ -48,5 +48,12 @@ namespace ControlAcceso.Endpoints.Users
         {
             return Ok(new Response { Message = "OK" });
         }
+
+        [HttpGet("{idUser}")]
+        public IActionResult GetUser(int idUser)
+        {
+            var user=_users?.SelectUser(idUser);
+            return Ok(new Response { Message = "OK", User=user });
+        }
     }
 }
