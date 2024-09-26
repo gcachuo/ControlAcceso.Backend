@@ -23,7 +23,7 @@ namespace ControlAcceso.Tests.Services
             
             //Act
             var service = new DbService(_loggerMock.Object, _dbConnectionMock.Object);
-            service.Insert("INSERT INTO users DEFAULT VALUES",new());
+            service.ExecuteNonQuery("INSERT INTO users DEFAULT VALUES",new());
 
             //Assert
             _dbConnectionMock.Verify(conn => conn.Open(), Times.Once);

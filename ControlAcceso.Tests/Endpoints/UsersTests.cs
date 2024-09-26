@@ -36,15 +36,18 @@ namespace ControlAcceso.Tests.Endpoints
         {
             //Arrange
             const string idUser = "1";
-            
+            var request = new Request(){Password = "123456"};
+
             //Mock
+            _usersDbContext.Setup(context => context.UpdateUser(It.IsAny<UserModel>(),"1"));
+            
             //Act
             var endpoint = new Endpoint(_usersDbContext.Object);
-            var result = endpoint.EditUser(idUser) as ObjectResult;;
+            var result = endpoint.EditUser(idUser, request) as ObjectResult;
 
             //Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
-            (result!.Value as Response)!.Message.Should().Be("OK");
+            (result!.Value as Response)!.Message.Should().Be("Usuario actualizado correctamente");
         }
     }
 }

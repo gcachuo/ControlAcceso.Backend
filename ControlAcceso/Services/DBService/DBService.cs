@@ -14,7 +14,7 @@ namespace ControlAcceso.Services.DBService
             _connection = connection;
         }
 
-        public void Insert(string insertQuery, Dictionary<string, dynamic> insertParameters)
+        public void ExecuteNonQuery(string insertQuery, Dictionary<string, dynamic> insertParameters)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace ControlAcceso.Services.DBService
             }
         }
 
-        public List<Dictionary<string, object>> Select(string selectQuery, Dictionary<string, dynamic> selectParameters)
+        public List<Dictionary<string, object>> ExecuteReader(string selectQuery, Dictionary<string, dynamic> selectParameters)
         {
             try
             {
