@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+using ControlAcceso.Data.Roles;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ControlAcceso.Endpoints.Roles
 {
@@ -6,10 +8,28 @@ namespace ControlAcceso.Endpoints.Roles
     [Route("roles")]
     public class Endpoint : ControllerBase
     {
-        [HttpPost("create")]
-        public IActionResult CreateRole()
+        private IRolesDbContext? _roles { get; }
+        
+        public Endpoint(IRolesDbContext? roles)
         {
-            return Ok(new Response { Message = "OK" });
+            _roles = roles;
+        }
+
+        [HttpPost("create")]
+        public IActionResult CreateRole([FromBody] Request request)
+        {
+            try
+            {
+                _roles?.InsertRole(new()
+                {
+                    Name = request.Name,
+                });
+                return Ok(new Response { Message = "OK" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new Response { Message = e.Message });
+            }
         }
     }
 }

@@ -36,11 +36,13 @@ namespace ControlAcceso.Tests.Endpoints
         {
             //Arrange
             const string idUser = "1";
-            
+
             //Mock
+            var request = new Request(){Password = "123456"};
+            
             //Act
             var endpoint = new Endpoint(_usersDbContext.Object);
-            var result = endpoint.EditUser(idUser) as ObjectResult;;
+            var result = endpoint.EditUser(idUser, request) as ObjectResult;
 
             //Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
