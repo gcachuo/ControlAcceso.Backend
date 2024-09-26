@@ -54,7 +54,7 @@ namespace ControlAcceso.Tests.Endpoints
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
             (result!.Value as Response)!.Message.Should().Be("Usuario actualizado correctamente");
 
-            //Veridica que el mock haya sido llamado
+            //Verifica que el mock haya sido llamado
             _usersDbContext.Verify(x => x.UpdateUser(It.IsAny<UserModel>(), It.IsAny<string>()), Times.Once);
 
         }

@@ -59,7 +59,7 @@ namespace ControlAcceso.Data.Users
                         password = @Password,
                         phone_number = @PhoneNumber,
                         address = @Address
-                    WHERE idUser = @IdUser";
+                    WHERE id = @IdUser";
 
                 DbService.ExecuteNonQuery(insertQuery, new()
                 {
