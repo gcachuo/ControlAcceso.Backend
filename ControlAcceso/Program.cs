@@ -1,5 +1,6 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
 using Npgsql;
@@ -17,7 +18,8 @@ namespace ControlAcceso
             
             builder.Services
                 .AddScoped<IDbConnection, NpgsqlConnection>()
-                .AddScoped<IUsersDbContext, UsersDbContext>();
+                .AddScoped<IUsersDbContext, UsersDbContext>()
+                .AddScoped<IRolesDbContext, RolesDbContext>();
             
             // Inyectar la configuración para obtener el connection string
             builder.Services.AddTransient<IDbConnection>(sp =>
