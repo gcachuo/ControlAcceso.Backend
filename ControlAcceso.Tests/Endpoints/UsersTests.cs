@@ -35,7 +35,7 @@ namespace ControlAcceso.Tests.Endpoints
         public void Should_Edit_User_Successfully()
         {
             //Arrange
-            const string idUser = "1";
+            const int idUser = 1;
 
             //Mock
             var request = new Request(){Password = "123456"};

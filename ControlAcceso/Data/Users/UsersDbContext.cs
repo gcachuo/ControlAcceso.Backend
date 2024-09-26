@@ -45,7 +45,7 @@ namespace ControlAcceso.Data.Users
             }
         }
 
-        public void UpdateUser(UserModel user, string idUser)
+        public void UpdateUser(UserModel user, int idUser)
         {
             try
             {
@@ -76,10 +76,8 @@ namespace ControlAcceso.Data.Users
             }   
             catch (PostgresException e)
             {
-                if (e.Data["SqlState"]?.ToString() == "23505")  // Captura error de duplicado
-                {
-                    throw new DataException("Error de actualización: Usuario duplicado.");
-                }
+            
+                throw;
             }
         }
 

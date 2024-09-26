@@ -47,7 +47,7 @@ namespace ControlAcceso.Endpoints.Users
 
         
         [HttpPatch("{idUser}")]
-        public IActionResult EditUser(string idUser, [FromBody] Request request)
+        public IActionResult EditUser(int idUser, [FromBody] Request request)
         {
             try
             {
