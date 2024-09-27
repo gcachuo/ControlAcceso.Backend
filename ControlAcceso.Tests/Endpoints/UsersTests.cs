@@ -55,11 +55,16 @@ namespace ControlAcceso.Tests.Endpoints
         public void Should_Edit_User_Successfully()
         {
             //Arrange
-            const string idUser = "1";
-            var request = new Request(){Password = "123456"};
+            const int idUser = 1;
 
             //Mock
-            _usersDbContext.Setup(context => context.UpdateUser(It.IsAny<UserModel>(),"1"));
+            var request = new Request(){Password = "123456"};
+            // Mock setup for UpdateUser
+
+            _usersDbContext.Setup(x => x.UpdateUser(It.IsAny<UserModel>(), It.IsAny<int>()))
+               .Verifiable();  // Verifica que el método fue llamado
+            // Suponiendo que el método UpdateUser retorna un booleano
+
             
             //Act
             var endpoint = new Endpoint(_usersDbContext.Object);
@@ -68,6 +73,10 @@ namespace ControlAcceso.Tests.Endpoints
             //Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
             (result!.Value as Response)!.Message.Should().Be("Usuario actualizado correctamente");
+
+            //Verifica que el mock haya sido llamado
+            _usersDbContext.Verify(x => x.UpdateUser(It.IsAny<UserModel>(), It.IsAny<int>()), Times.Once);
+
         }
         
         [Fact]

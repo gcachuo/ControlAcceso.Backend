@@ -22,17 +22,21 @@ namespace ControlAcceso.Tests.Data
             _dbServiceMock.Verify(x=>x.ExecuteNonQuery(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
         }
 
-        [Fact]
-        public void Should_Update_User()
+        [Fact] 
+        public void Should_Edit_User_Successfully()
         {
             //Arrange
+            var idUser = 1;
+            var user = new UserModel();
+
             //Mock
+
             //Act
             var context = new UsersDbContext(_dbServiceMock.Object);
-            context.UpdateUser(new(),"1");
+            context.UpdateUser(user, idUser);
 
             //Assert
-            _dbServiceMock.Verify(x=>x.ExecuteNonQuery(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
+           _dbServiceMock.Verify(x=>x.ExecuteNonQuery(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
         }
 
         [Fact]
