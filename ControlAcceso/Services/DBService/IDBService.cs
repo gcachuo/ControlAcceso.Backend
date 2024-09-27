@@ -2,6 +2,8 @@
 {
     public interface IDbService
     {
-        public void Insert(string insertQuery, Dictionary<string, dynamic> insertParameters);
+    public void ExecuteNonQuery(string insertQuery, Dictionary<string, dynamic> insertParameters);    
+    
     }
+
 }

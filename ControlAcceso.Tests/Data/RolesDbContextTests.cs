@@ -20,7 +20,7 @@ namespace ControlAcceso.Tests.Data
             context.InsertRole(new());
 
             //Assert
-            _dbServiceMock.Verify(x=>x.Insert(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
+            _dbServiceMock.Verify(x=>x.ExecuteNonQuery(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
         }
     }
 }

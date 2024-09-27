@@ -18,7 +18,7 @@ namespace ControlAcceso.Data.Users
         {
             try
             {
-                DbService.Insert("""
+                DbService.ExecuteNonQuery("""
                                     INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address)
                                     VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address)
                                  """,
@@ -44,5 +44,42 @@ namespace ControlAcceso.Data.Users
                 }
             }
         }
+
+        public void UpdateUser(UserModel user, int idUser)
+        {
+            try
+            {
+                var insertQuery = @"
+                    UPDATE Users
+                    SET email = @Email,
+                        firstname = @FirstName,
+                        second_name = @SecondName,
+                        lastname = @LastName,
+                        second_lastname = @SecondLastname,
+                        password = @Password,
+                        phone_number = @PhoneNumber,
+                        address = @Address
+                    WHERE id = @IdUser";
+
+                DbService.ExecuteNonQuery(insertQuery, new()
+                {
+                    { "@IdUser", idUser },
+                    { "@Email", user.Email },
+                    { "@FirstName", user.FirstName },
+                    { "@SecondName", user.SecondName },
+                    { "@LastName", user.Lastname },
+                    { "@SecondLastname", user.SecondLastname },
+                    { "@Password", user.Password },
+                    { "@PhoneNumber", user.PhoneNumber },
+                    { "@Address", user.Address }
+                });
+            }   
+            catch (PostgresException e)
+            {
+            
+                throw;
+            }
+        }
+
     }
 }

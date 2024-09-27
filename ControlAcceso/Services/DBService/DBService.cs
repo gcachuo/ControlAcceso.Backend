@@ -14,7 +14,7 @@ namespace ControlAcceso.Services.DBService
             _connection = connection;
         }
 
-        public void Insert(string insertQuery, Dictionary<string, dynamic> insertParameters)
+        public void ExecuteNonQuery(string insertQuery, Dictionary<string, dynamic> insertParameters)
         {
             try
             {
@@ -43,6 +43,9 @@ namespace ControlAcceso.Services.DBService
             {
                 _connection.Close(); // Cierra la conexión
             }
+
         }
+       
+        
     }
 }

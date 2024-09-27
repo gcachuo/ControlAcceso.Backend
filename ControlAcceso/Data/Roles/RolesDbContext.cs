@@ -18,7 +18,7 @@ public class RolesDbContext:IRolesDbContext
     {
         try
         {
-            DbService.Insert("""
+            DbService.ExecuteNonQuery("""
                                 INSERT INTO Roles(name)
                                 VALUES (@name)
                              """,
