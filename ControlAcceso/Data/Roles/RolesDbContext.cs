@@ -34,6 +34,8 @@ public class RolesDbContext:IRolesDbContext
             {
                 throw new DataException("Rol duplicado.");
             }
+
+            throw;
         }
     }
 }

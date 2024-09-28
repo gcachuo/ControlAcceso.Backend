@@ -13,3 +13,12 @@
     constraint users_pk
         unique (address, phone_number)
 );
+create table roles
+(
+    id   serial
+        constraint roles_pk
+            primary key,
+    name varchar not null
+        constraint roles_pk_2
+            unique
+);
