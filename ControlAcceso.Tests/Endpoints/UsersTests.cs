@@ -1,10 +1,12 @@
-﻿using ControlAcceso.Data.Model;
+﻿using System.Data;
+using ControlAcceso.Data.Model;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Endpoints.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
 using Moq;
+using Npgsql;
 using Endpoint = ControlAcceso.Endpoints.Users.Endpoint;
 
 namespace ControlAcceso.Tests.Endpoints
@@ -29,6 +31,24 @@ namespace ControlAcceso.Tests.Endpoints
             //Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
             (result!.Value as Response)!.Message.Should().Be("OK");
+        }
+        
+        [Fact]
+        public void When_User_Is_Already_Registered_Then_Exception_Is_Thrown()
+        {
+            //Arrange
+            var request = new Request(){Password = "123456"};
+            
+            //Mock
+            _usersDbContext.Setup(x => x.InsertUser(It.IsAny<UserModel>())).Throws<DataException>(() => new("Usuario duplicado."));
+            
+            //Act
+            var endpoint = new Endpoint(_usersDbContext.Object);
+            var result = endpoint.RegisterUser(request) as ObjectResult;;
+
+            //Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status400BadRequest, result.Value?.ToString());
+            (result!.Value as Response)!.Message.Should().Be("Usuario duplicado.");
         }
         
         [Fact]
@@ -57,6 +77,24 @@ namespace ControlAcceso.Tests.Endpoints
             //Verifica que el mock haya sido llamado
             _usersDbContext.Verify(x => x.UpdateUser(It.IsAny<UserModel>(), It.IsAny<int>()), Times.Once);
 
+        }
+        
+        [Fact]
+        public void Should_Get_User_Successfully()
+        {
+            //Arrange
+            const int idUser = 1;
+
+            //Mock
+            _usersDbContext.Setup(x=>x.SelectUser(idUser)).Returns(new UserModel());
+            
+            //Act
+            var endpoint = new Endpoint(_usersDbContext.Object);
+            var result = endpoint.GetUser(idUser) as ObjectResult;
+
+            //Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
+            (result!.Value as Response)!.Message.Should().Be("OK");
         }
     }
 }

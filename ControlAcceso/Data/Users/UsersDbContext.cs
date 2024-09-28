@@ -5,7 +5,7 @@ using Npgsql;
 
 namespace ControlAcceso.Data.Users
 {
-    public class UsersDbContext:IUsersDbContext
+    public class UsersDbContext : IUsersDbContext
     {
         private IDbService DbService { get; set; }
 
@@ -79,6 +79,24 @@ namespace ControlAcceso.Data.Users
             
                 throw;
             }
+        }
+
+        public UserModel? SelectUser(int id)
+        {
+            var row = DbService.ExecuteReader("SELECT * FROM Users where id=@id", new() { { "@id", id } }).SingleOrDefault();
+            if (row == null)
+                return null;
+            return new()
+            {
+                Address = row["address"]?.ToString(),
+                PhoneNumber = row["phone_number"]?.ToString(),
+                Username = row["username"]?.ToString(),
+                Email = row["email"]?.ToString(),
+                FirstName = row["firstname"]?.ToString(),
+                SecondName = row["second_name"]?.ToString(),
+                Lastname = row["lastname"]?.ToString(),
+                SecondLastname = row["second_lastname"]?.ToString(),
+            };
         }
 
     }

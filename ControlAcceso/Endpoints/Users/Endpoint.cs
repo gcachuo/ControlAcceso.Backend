@@ -53,7 +53,6 @@ namespace ControlAcceso.Endpoints.Users
             {
                 
                 var hashedPassword = PasswordHasher.HashPassword(request.Password);
-
                 
                 var user = new UserModel
                 {
@@ -71,12 +70,18 @@ namespace ControlAcceso.Endpoints.Users
                 _users?.UpdateUser(user, idUser);
 
                 return Ok(new Response { Message = "Usuario actualizado correctamente" });
-            }
+                }
             catch (DataException e)
             {
                 return BadRequest(new Response { Message = e.Message });
             }
         }
 
+        [HttpGet("{idUser}")]
+        public IActionResult GetUser(int idUser)
+        {
+            var user=_users?.SelectUser(idUser);
+            return Ok(new Response { Message = "OK", User=user });
+        }
     }
 }
