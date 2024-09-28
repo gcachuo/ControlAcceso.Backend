@@ -1,0 +1,4 @@
+/bin/
+/obj/
+coverage.cobertura.xml
+*.trx
