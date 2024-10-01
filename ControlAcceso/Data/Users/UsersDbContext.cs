@@ -99,5 +99,11 @@ namespace ControlAcceso.Data.Users
             };
         }
 
+        public string? SelectPassword(string? username)
+        {
+           var row=DbService.ExecuteReader("SELECT password FROM Users where username=@username or email=@username or phone_number=@username", 
+               new() { { "@username", username } }).SingleOrDefault();
+           return row?["password"].ToString();
+        }
     }
 }

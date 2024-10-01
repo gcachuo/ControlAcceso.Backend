@@ -18,7 +18,7 @@ namespace ControlAcceso.Endpoints.Users
         }
         
         [HttpPost("register")]
-        public IActionResult RegisterUser([FromBody] Request request)
+        public IActionResult RegisterUser([FromBody] UserRequest request)
         {
             var hashedPassword=PasswordHasher.HashPassword(request.Password);
             var username = $"{request.FirstName?.ToLower().Replace(" ","")}.{request.FirstSurname?.ToLower().Replace(" ","")}";
@@ -36,18 +36,18 @@ namespace ControlAcceso.Endpoints.Users
                     PhoneNumber = request.Phone,
                     Address = request.Address
                 });
-                return Ok(new Response { Message = "OK" });
+                return Ok(new UserResponse { Message = "OK" });
             }
             catch (DataException e)
             {
-                return BadRequest(new Response { Message = e.Message });
+                return BadRequest(new UserResponse { Message = e.Message });
             }
         }
 
 
         
         [HttpPatch("{idUser}")]
-        public IActionResult EditUser(int idUser, [FromBody] Request request)
+        public IActionResult EditUser(int idUser, [FromBody] UserRequest request)
         {
             try
             {
@@ -69,11 +69,11 @@ namespace ControlAcceso.Endpoints.Users
                 
                 _users?.UpdateUser(user, idUser);
 
-                return Ok(new Response { Message = "Usuario actualizado correctamente" });
+                return Ok(new UserResponse { Message = "Usuario actualizado correctamente" });
                 }
             catch (DataException e)
             {
-                return BadRequest(new Response { Message = e.Message });
+                return BadRequest(new UserResponse { Message = e.Message });
             }
         }
 
@@ -81,7 +81,18 @@ namespace ControlAcceso.Endpoints.Users
         public IActionResult GetUser(int idUser)
         {
             var user=_users?.SelectUser(idUser);
-            return Ok(new Response { Message = "OK", User=user });
+            return Ok(new UserResponse { Message = "OK", User=user });
+        }
+
+        [HttpPost("login")]
+        public IActionResult LoginUser([FromBody] LoginRequest request)
+        {
+           var passwordHash = _users.SelectPassword(request.Username);
+           if (passwordHash is not null && PasswordHasher.VerifyPassword(request.Password, passwordHash))
+           {
+               return Ok(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "OK" });
+           }
+           return Unauthorized(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "Unauthorized"});
         }
     }
 }

@@ -58,6 +58,8 @@ namespace ControlAcceso
             app.MapControllers();
             
             app.UseCors("AllowAllOrigins");
+            
+            DotNetEnv.Env.Load();
 
             app.Run();
         }
