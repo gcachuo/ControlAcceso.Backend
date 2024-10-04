@@ -1,8 +1,12 @@
 ﻿using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 using ControlAcceso.Data.Model;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ControlAcceso.Endpoints.Users
 {
@@ -90,9 +94,43 @@ namespace ControlAcceso.Endpoints.Users
            var passwordHash = _users.SelectPassword(request.Username);
            if (passwordHash is not null && PasswordHasher.VerifyPassword(request.Password, passwordHash))
            {
-               return Ok(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "OK" });
+               var user = _users.SelectUser(request.Username);
+
+               var claims = new List<Claim>
+               {
+                   new("UserId", user.Id.ToString()),
+                   new("Role", user.Role)
+               };
+               var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
+               var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+               var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+               return Ok(new LoginResponse { AccessToken = GenerateAccessToken(claims,signingKey,issuer,audience), RefreshToken = GenerateRefreshToken(), Message = "OK" });
            }
            return Unauthorized(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "Unauthorized"});
+        }
+        public string GenerateAccessToken(IEnumerable<Claim> claims, string signingKey, string issuer, string audience)
+        {
+            var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(signingKey));
+            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var securityToken = new JwtSecurityToken(
+                issuer,
+                audience,
+                claims,
+                expires: DateTime.Now.AddHours(1),  // Duración del Access Token (1 hora)
+                signingCredentials: signingCredentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(securityToken);
+        }
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
     }
 }

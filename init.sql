@@ -1,6 +1,7 @@
 ﻿create table users
 (
-    id              serial  primary key,
+    id              serial
+        primary key,
     address         varchar not null,
     phone_number    varchar not null,
     username        varchar not null,
@@ -10,6 +11,10 @@
     lastname        varchar not null,
     second_lastname varchar,
     password        varchar not null,
+    role_id         integer not null
+        constraint users_roles_id_fk
+            references roles
+            on update cascade on delete cascade,
     constraint users_pk
         unique (address, phone_number)
 );
