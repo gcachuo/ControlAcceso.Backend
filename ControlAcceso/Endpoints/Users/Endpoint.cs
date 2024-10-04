@@ -92,21 +92,21 @@ namespace ControlAcceso.Endpoints.Users
         public IActionResult LoginUser([FromBody] LoginRequest request)
         {
            var passwordHash = _users.SelectPassword(request.Username);
-           if (passwordHash is not null && PasswordHasher.VerifyPassword(request.Password, passwordHash))
-           {
-               var user = _users.SelectUser(request.Username);
+           if (passwordHash is null || !PasswordHasher.VerifyPassword(request.Password, passwordHash))
+               return Unauthorized(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "Unauthorized" });
+           
+           var user = _users.SelectUser(request.Username);
 
-               var claims = new List<Claim>
-               {
-                   new("UserId", user.Id.ToString()),
-                   new("Role", user.Role)
-               };
-               var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
-               var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-               var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-               return Ok(new LoginResponse { AccessToken = GenerateAccessToken(claims,signingKey,issuer,audience), RefreshToken = GenerateRefreshToken(), Message = "OK" });
-           }
-           return Unauthorized(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "Unauthorized"});
+           var claims = new List<Claim>
+           {
+               new("UserId", user.Id.ToString()),
+               new("Role", user.Role)
+           };
+           var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
+           var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+           var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+           
+           return Ok(new LoginResponse { AccessToken = GenerateAccessToken(claims,signingKey,issuer,audience), RefreshToken = GenerateRefreshToken(), Message = "OK" });
         }
         public string GenerateAccessToken(IEnumerable<Claim> claims, string signingKey, string issuer, string audience)
         {
