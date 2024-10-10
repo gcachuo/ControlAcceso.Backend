@@ -8,6 +8,7 @@ using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 using ControlAcceso.Data.Model;
 using ControlAcceso.Data.RefreshTokens;
+using ControlAcceso.Tools.HttpContext;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ControlAcceso.Endpoints.Users
@@ -18,11 +19,13 @@ namespace ControlAcceso.Endpoints.Users
     {
         private IUsersDbContext? _users { get; }
         private IRefreshTokensDbContext? _refreshTokens { get; }
+        private IHttpContext? _httpContext { get; }
         
-        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens)
+        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext)
         {
             _users = users;
             _refreshTokens = refreshTokens;
+            _httpContext = httpContext;
         }
         
         [HttpPost("register")]
@@ -113,26 +116,12 @@ namespace ControlAcceso.Endpoints.Users
            var accessToken = GenerateAccessToken(claims,signingKey,issuer,audience);
            var refreshToken = GenerateRefreshToken();
            
-           var ipAddress = getIpAddress();
+           var ipAddress = _httpContext.GetIpAddress();
            _refreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent);
            
            return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken, Message = "OK" });
         }
 
-        public string getIpAddress()
-        {
-            var ipAddress = HttpContext.Connection.RemoteIpAddress;
-        
-            // Verificar si la IP es IPv4 o IPv6
-            if (ipAddress != null && ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
-            {
-                // Si es IPv6, puedes convertirla a una cadena legible
-                ipAddress = Dns.GetHostEntry(ipAddress).AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
-            }
-
-            return ipAddress.ToString();
-        }
-        
         public string GenerateAccessToken(IEnumerable<Claim> claims, string signingKey, string issuer, string audience)
         {
             var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(signingKey));
