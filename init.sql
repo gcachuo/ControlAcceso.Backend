@@ -27,3 +27,18 @@ create table roles
         constraint roles_pk_2
             unique
 );
+create table refresh_tokens
+(
+    id           serial
+        primary key,
+    token        text      not null,
+    user_id      integer   not null
+        constraint fk_user
+            references users,
+    created_at   timestamp not null,
+    expires_at   timestamp not null,
+    is_valid     boolean default true,
+    ip_address   varchar(45),
+    user_agent   text,
+    last_used_at timestamp
+);

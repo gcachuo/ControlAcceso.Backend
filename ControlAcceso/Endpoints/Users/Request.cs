@@ -1,4 +1,6 @@
-﻿namespace ControlAcceso.Endpoints.Users
+﻿using System.Text.Json.Serialization;
+
+namespace ControlAcceso.Endpoints.Users
 {
     public class UserRequest
     {
@@ -23,5 +25,7 @@
     {
         public string? Username { get; set; }
         public string? Password { get; set; }
+        [JsonPropertyName("user_agent")]
+        public string? UserAgent { get; set; }
     }
 }

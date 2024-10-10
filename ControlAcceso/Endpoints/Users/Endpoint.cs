@@ -1,11 +1,13 @@
 ﻿using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 using ControlAcceso.Data.Model;
+using ControlAcceso.Data.RefreshTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ControlAcceso.Endpoints.Users
@@ -15,10 +17,12 @@ namespace ControlAcceso.Endpoints.Users
     public class Endpoint : ControllerBase
     {
         private IUsersDbContext? _users { get; }
+        private IRefreshTokensDbContext? _refreshTokens { get; }
         
-        public Endpoint(IUsersDbContext? users)
+        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens)
         {
             _users = users;
+            _refreshTokens = refreshTokens;
         }
         
         [HttpPost("register")]
@@ -105,9 +109,30 @@ namespace ControlAcceso.Endpoints.Users
            var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+
+           var accessToken = GenerateAccessToken(claims,signingKey,issuer,audience);
+           var refreshToken = GenerateRefreshToken();
            
-           return Ok(new LoginResponse { AccessToken = GenerateAccessToken(claims,signingKey,issuer,audience), RefreshToken = GenerateRefreshToken(), Message = "OK" });
+           var ipAddress = getIpAddress();
+           _refreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent);
+           
+           return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken, Message = "OK" });
         }
+
+        public string getIpAddress()
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress;
+        
+            // Verificar si la IP es IPv4 o IPv6
+            if (ipAddress != null && ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+            {
+                // Si es IPv6, puedes convertirla a una cadena legible
+                ipAddress = Dns.GetHostEntry(ipAddress).AddressList.First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            }
+
+            return ipAddress.ToString();
+        }
+        
         public string GenerateAccessToken(IEnumerable<Claim> claims, string signingKey, string issuer, string audience)
         {
             var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(signingKey));
