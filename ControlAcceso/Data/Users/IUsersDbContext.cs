@@ -7,6 +7,7 @@ namespace ControlAcceso.Data.Users
         public void UpdateUser(UserModel user, int idUser); 
 
         public void InsertUser(UserModel user);
+        
         public UserModel SelectUser(int id);
     }
 }
