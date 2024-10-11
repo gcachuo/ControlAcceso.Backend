@@ -16,7 +16,7 @@ namespace ControlAcceso.Endpoints.Roles
         }
 
         [HttpGet("")]
-        public IActionResult GetRole()
+        public IActionResult GetRoleList()
         {
             var role = _roles?.SelectRole();
             return Ok(new Response {Message = "OK", Role=role});
