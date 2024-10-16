@@ -71,7 +71,7 @@ namespace ControlAcceso.Data.Users
                     { "@LastName", user.Lastname },
                     { "@SecondLastname", user.SecondLastname },
                     { "@PhoneNumber", user.PhoneNumber },
-                    { "@Address", user.Address }
+                    { "@Address", user.Address },
                     { "@Role", user.Role }
                 });
             }   
