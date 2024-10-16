@@ -57,7 +57,8 @@ namespace ControlAcceso.Data.Users
                         lastname = @LastName,
                         second_lastname = @SecondLastname,
                         phone_number = @PhoneNumber,
-                        address = @Address
+                        address = @Address,
+                        role = @Role
                     WHERE id = @IdUser";
 
                 DbService.ExecuteNonQuery(insertQuery, new()
@@ -70,6 +71,7 @@ namespace ControlAcceso.Data.Users
                     { "@SecondLastname", user.SecondLastname },
                     { "@PhoneNumber", user.PhoneNumber },
                     { "@Address", user.Address }
+                    { "@Role", user.Role }
                 });
             }   
             catch (PostgresException e)
@@ -94,6 +96,7 @@ namespace ControlAcceso.Data.Users
                 SecondName = row["second_name"]?.ToString(),
                 Lastname = row["lastname"]?.ToString(),
                 SecondLastname = row["second_lastname"]?.ToString(),
+                Role = row["role"]?.ToString(),
             };
         }
 
