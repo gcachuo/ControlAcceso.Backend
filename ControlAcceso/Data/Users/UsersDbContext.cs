@@ -19,8 +19,8 @@ namespace ControlAcceso.Data.Users
             try
             {
                 DbService.ExecuteNonQuery("""
-                                    INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address)
-                                    VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address)
+                                    INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address, role)
+                                    VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address, @role)
                                  """,
                     new()
                     {
@@ -33,6 +33,7 @@ namespace ControlAcceso.Data.Users
                         { "@password", user.Password },
                         { "@phone_number", user.PhoneNumber },
                         { "@address", user.Address },
+                        { "@role", user.Role },
                     }
                 );
             }
