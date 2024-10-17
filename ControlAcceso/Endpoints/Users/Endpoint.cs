@@ -35,7 +35,7 @@ namespace ControlAcceso.Endpoints.Users
                     Password = hashedPassword,
                     PhoneNumber = request.Phone,
                     Address = request.Address,
-                    Role = request.Role
+                    RoleId = request.RoleId
                 });
                 return Ok(new Response { Message = "OK" });
             }
@@ -62,7 +62,7 @@ namespace ControlAcceso.Endpoints.Users
                     SecondLastname = request.SecondSurname,
                     PhoneNumber = request.Phone,
                     Address = request.Address,
-                    Role = request.Role
+                    RoleId = request.RoleId,
                 };
 
                 

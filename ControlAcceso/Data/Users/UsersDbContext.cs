@@ -33,7 +33,7 @@ namespace ControlAcceso.Data.Users
                         { "@password", user.Password },
                         { "@phone_number", user.PhoneNumber },
                         { "@address", user.Address },
-                        { "@role", user.Role },
+                        { "@role_id", user.RoleId },
                     }
                 );
             }
@@ -72,7 +72,7 @@ namespace ControlAcceso.Data.Users
                     { "@SecondLastname", user.SecondLastname },
                     { "@PhoneNumber", user.PhoneNumber },
                     { "@Address", user.Address },
-                    { "@Role", user.Role }
+                    { "@RoleId", user.RoleId }
                 });
             }   
             catch (PostgresException e)
@@ -97,7 +97,7 @@ namespace ControlAcceso.Data.Users
                 SecondName = row["second_name"]?.ToString(),
                 Lastname = row["lastname"]?.ToString(),
                 SecondLastname = row["second_lastname"]?.ToString(),
-                Role = row["role"]?.ToString(),
+                RoleId = row["role_id"]?.ToString(),
             };
         }
 
