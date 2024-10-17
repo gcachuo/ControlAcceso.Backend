@@ -15,6 +15,14 @@ namespace ControlAcceso.Endpoints.Roles
             _roles = roles;
         }
 
+        [HttpGet("")]
+        public IActionResult GetRoleList()
+        {
+            var role = _roles?.SelectRole();
+            return Ok(new Response {Message = "OK", Role=role});
+            
+        }
+
         [HttpPost("create")]
         public IActionResult CreateRole([FromBody] Request request)
         {

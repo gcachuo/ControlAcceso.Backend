@@ -31,5 +31,47 @@ namespace ControlAcceso.Tests.Endpoints
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
             (result!.Value as Response)!.Message.Should().Be("OK");
         }
+   
+        private readonly Mock<IRolesDbContext> _rolesDbContext = new(MockBehavior.Strict);
+
+        [Fact]
+        public void Should_Get_Roles_Successfully()
+        {
+            // Arrange
+            var mockRoles = new List<RoleModel>
+            {
+                new RoleModel { Name = "Admin" },
+                new RoleModel { Name = "User" }
+            };
+
+            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+
+            // Act
+            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var result = endpoint.GetRoleList() as ObjectResult;
+
+            // Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status200OK);
+            (result!.Value as Response)!.Role.Should().BeEquivalentTo(mockRoles); 
+        }
+
+
+        [Fact]
+        public void Should_Handle_Empty_Role_List()
+        {
+            // Arrange
+            var mockRoles = new List<RoleModel>(); 
+
+            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+
+            // Act
+            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var result = endpoint.GetRoleList() as ObjectResult;
+
+            // Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status200OK);
+            (result!.Value as Response)!.Role.Should().BeEmpty(); 
+        }
+
     }
 }
