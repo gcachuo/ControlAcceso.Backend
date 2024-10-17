@@ -56,7 +56,6 @@ namespace ControlAcceso.Data.Users
                         second_name = @SecondName,
                         lastname = @LastName,
                         second_lastname = @SecondLastname,
-                        password = @Password,
                         phone_number = @PhoneNumber,
                         address = @Address
                     WHERE id = @IdUser";
@@ -69,7 +68,6 @@ namespace ControlAcceso.Data.Users
                     { "@SecondName", user.SecondName },
                     { "@LastName", user.Lastname },
                     { "@SecondLastname", user.SecondLastname },
-                    { "@Password", user.Password },
                     { "@PhoneNumber", user.PhoneNumber },
                     { "@Address", user.Address }
                 });
