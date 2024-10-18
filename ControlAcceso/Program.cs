@@ -4,6 +4,7 @@ using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
+using ControlAcceso.Tools.HttpContext;
 using Npgsql;
 
 namespace ControlAcceso
@@ -18,6 +19,7 @@ namespace ControlAcceso
             builder.Services.AddOpenApi();
             
             builder.Services
+                .AddScoped<IHttpContext, Tools.HttpContext.HttpContext>()
                 .AddScoped<IDbConnection, NpgsqlConnection>()
                 .AddScoped<IRefreshTokensDbContext, RefreshTokensDbContext>()
                 .AddScoped<IUsersDbContext, UsersDbContext>()
