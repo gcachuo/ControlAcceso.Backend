@@ -74,11 +74,10 @@ namespace ControlAcceso.Data.Users
                     { "@Address", user.Address },
                     { "@RoleId", user.RoleId }
                 });
-            }   
-            catch (PostgresException e)
+            }
+            finally
             {
-            
-                throw;
+                
             }
         }
 
