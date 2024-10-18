@@ -19,8 +19,8 @@ namespace ControlAcceso.Data.Users
             try
             {
                 DbService.ExecuteNonQuery("""
-                                    INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address)
-                                    VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address)
+                                    INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address, role_id)
+                                    VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address, @role_id)
                                  """,
                     new()
                     {
@@ -33,6 +33,7 @@ namespace ControlAcceso.Data.Users
                         { "@password", user.Password },
                         { "@phone_number", user.PhoneNumber },
                         { "@address", user.Address },
+                        { "@role_id", user.RoleId },
                     }
                 );
             }
@@ -56,9 +57,9 @@ namespace ControlAcceso.Data.Users
                         second_name = @SecondName,
                         lastname = @LastName,
                         second_lastname = @SecondLastname,
-                        password = @Password,
                         phone_number = @PhoneNumber,
-                        address = @Address
+                        address = @Address,
+                        role_id = @RoleId
                     WHERE id = @IdUser";
 
                 DbService.ExecuteNonQuery(insertQuery, new()
@@ -69,9 +70,9 @@ namespace ControlAcceso.Data.Users
                     { "@SecondName", user.SecondName },
                     { "@LastName", user.Lastname },
                     { "@SecondLastname", user.SecondLastname },
-                    { "@Password", user.Password },
                     { "@PhoneNumber", user.PhoneNumber },
-                    { "@Address", user.Address }
+                    { "@Address", user.Address },
+                    { "@RoleId", user.RoleId }
                 });
             }   
             catch (PostgresException e)
@@ -96,6 +97,7 @@ namespace ControlAcceso.Data.Users
                 SecondName = row["second_name"]?.ToString(),
                 Lastname = row["lastname"]?.ToString(),
                 SecondLastname = row["second_lastname"]?.ToString(),
+                RoleId = row["role_id"]?.ToString(),
             };
         }
 

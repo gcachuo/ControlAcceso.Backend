@@ -19,6 +19,9 @@ namespace ControlAcceso.Endpoints.Users
         public string? Phone { get; set; }
 
         public string? Address { get; set; }
+
+        public string? RoleId { get; set; }
+
     }
 
     public class LoginRequest
