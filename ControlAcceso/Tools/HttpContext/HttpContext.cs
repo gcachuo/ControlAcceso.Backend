@@ -1,9 +1,11 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ControlAcceso.Tools.HttpContext
 {
+    [ExcludeFromCodeCoverage]
     public class HttpContext : ControllerBase, IHttpContext
     {
         public string GetIpAddress()
