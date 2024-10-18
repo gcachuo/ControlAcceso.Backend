@@ -36,8 +36,8 @@ namespace ControlAcceso.Tests.Endpoints
             
             response!.Message.Should().Be("OK");
             
-            response!.Address.Should().NotBeNull();
-            response!.Address.Should().BeEquivalentTo(expectedAddresses);
+            response!.Addresses.Should().NotBeNull();
+            response!.Addresses.Should().BeEquivalentTo(expectedAddresses);
         }
 
 
@@ -57,8 +57,8 @@ namespace ControlAcceso.Tests.Endpoints
             var response = result!.Value as Response; 
             response!.Message.Should().Be("OK");
             
-            response.Address.Should().NotBeNull();
-            response.Address.Should().BeEmpty();
+            response.Addresses.Should().NotBeNull();
+            response.Addresses.Should().BeEmpty();
         }
 
     }
