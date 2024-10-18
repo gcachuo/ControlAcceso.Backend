@@ -1,5 +1,6 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
@@ -18,6 +19,7 @@ namespace ControlAcceso
             
             builder.Services
                 .AddScoped<IDbConnection, NpgsqlConnection>()
+                .AddScoped<IRefreshTokensDbContext, RefreshTokensDbContext>()
                 .AddScoped<IUsersDbContext, UsersDbContext>()
                 .AddScoped<IRolesDbContext, RolesDbContext>();
             
@@ -58,6 +60,8 @@ namespace ControlAcceso
             app.MapControllers();
             
             app.UseCors("AllowAllOrigins");
+            
+            DotNetEnv.Env.Load();
 
             app.Run();
         }
