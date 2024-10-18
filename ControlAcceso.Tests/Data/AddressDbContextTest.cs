@@ -5,32 +5,42 @@ using Moq;
 public class AddressesDbContextTests
 {
     [Fact]
-    public void SelectAddress_ReturnsListOfAddresses_WhenDataIsValid()
+public void SelectAddress_ReturnsListOfAddresses_WhenDataIsValid()
+{
+    // Arrange
+    var mockDbService = new Mock<IDbService>();
+
+    var fakeRows = new List<Dictionary<string, dynamic>>()
     {
-        // Arrange
-        var mockDbService = new Mock<IDbService>();
+        new Dictionary<string, dynamic> { { "street", "Main St" }, { "number", "123" } },
+        new Dictionary<string, dynamic> { { "street", "Second St" }, { "number", "456" } }
+    };
 
-        var fakeRows = new List<Dictionary<string, dynamic>>()
-        {
-            new Dictionary<string, dynamic> { { "street", "Main St" }, { "number", "123" } },
-            new Dictionary<string, dynamic> { { "street", "Second St" }, { "number", "456" } }
-        };
+    mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM addresses", It.IsAny<Dictionary<string, dynamic>>()))
+                 .Returns(fakeRows);
 
-        // Configurar el mock para que devuelva estas filas
-        mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM addresses", It.IsAny<Dictionary<string, dynamic>>()))
-                     .Returns(fakeRows);
+    var dbContext = new AddressesDbContext(mockDbService.Object);
 
-        var dbContext = new AddressesDbContext(mockDbService.Object);
+    // Act
+    var result = dbContext.SelectAddress();
 
-        // Act
-        var result = dbContext.SelectAddress();
+    // Assert
+    Assert.NotNull(result); 
+    Assert.Equal(2, result.Count()); 
 
-        // Assert
-        Assert.NotNull(result); 
-        Assert.Equal(2, result.Count()); 
-        Assert.Equal("Main St", result.First().Street);
-        Assert.Equal("123", result.First().Number);
+    // Verificar todas las direcciones devueltas
+    var expectedAddresses = new List<(string Street, string Number)>
+    {
+        ("Main St", "123"),
+        ("Second St", "456")
+    };
+
+    for (int i = 0; i < result.Count(); i++)
+    {
+        Assert.Equal(expectedAddresses[i].Street, result.ElementAt(i).Street);
+        Assert.Equal(expectedAddresses[i].Number, result.ElementAt(i).Number);
     }
+}
 
     [Fact]
     public void SelectAddress_ReturnsEmptyList()
@@ -63,11 +73,11 @@ public class AddressesDbContextTests
 
         var dbContext = new AddressesDbContext(mockDbService.Object);
 
-        // Act
-        var result = dbContext.SelectAddress();
+         // Act & Assert
+        var exception = Assert.Throws<Exception>(() => dbContext.SelectAddress());
 
-        // Assert
-        Assert.NotNull(result); 
-        Assert.Empty(result); 
+        // Ajustar la comparación al mensaje completo
+        Assert.Equal("Error al obtener direcciones: Database error", exception.Message);
+            
     }
 }

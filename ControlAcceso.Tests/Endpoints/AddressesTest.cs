@@ -16,16 +16,30 @@ namespace ControlAcceso.Tests.Endpoints
         public void Should_Get_Address_Successfully()
         {
             // Arrange
-            _addressesDbContext.Setup(x => x.SelectAddress()).Returns(new List<AddressModel>());
+            var expectedAddresses = new List<AddressModel>
+            {
+                new AddressModel { Street = "Main St", Number = "123" },
+                new AddressModel { Street = "Second St", Number = "456" }
+            };
+
+            _addressesDbContext.Setup(x => x.SelectAddress()).Returns(expectedAddresses);
+
+            var endpoint = new ControlAcceso.Endpoints.Addresses.Endpoint(_addressesDbContext.Object); 
 
             // Act
-            var endpoint = new ControlAcceso.Endpoints.Addresses.Endpoint(_addressesDbContext.Object); 
             var result = endpoint.GetAddress() as ObjectResult;
 
             // Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
-            (result!.Value as Response)!.Message.Should().Be("OK");
+            
+            var response = result?.Value as Response;
+            
+            response!.Message.Should().Be("OK");
+            
+            response!.Address.Should().NotBeNull();
+            response!.Address.Should().BeEquivalentTo(expectedAddresses);
         }
+
 
         [Fact]
         public void Should_Not_Get_Address()
@@ -39,7 +53,12 @@ namespace ControlAcceso.Tests.Endpoints
 
             // Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
-            (result!.Value as Response)!.Message.Should().Be("OK"); 
+            
+            var response = result!.Value as Response; 
+            response!.Message.Should().Be("OK");
+            
+            response.Address.Should().NotBeNull();
+            response.Address.Should().BeEmpty();
         }
 
     }

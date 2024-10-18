@@ -34,7 +34,7 @@ namespace ControlAcceso.Data.Addresses
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error al obtener direcciones: {e.Message}");
+                throw new Exception($"Error al obtener direcciones: {e.Message}");
             }
 
             return addresses;

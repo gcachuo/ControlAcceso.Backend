@@ -6,6 +6,6 @@ namespace ControlAcceso.Endpoints.Addresses
     {
         public string? Message { get; set; }
 
-        public IEnumerable<AddressModel>? Address { get; set; }
+        public IEnumerable<AddressModel>? Addresses { get; set; }
     }
 }

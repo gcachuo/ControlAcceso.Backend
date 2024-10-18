@@ -15,11 +15,11 @@ namespace ControlAcceso.Endpoints.Addresses
             _addresses = addresses;
         }
 
-        [HttpPost("")]
+        [HttpPost]
          public IActionResult GetAddress()
         {
-            var address=_addresses?.SelectAddress();
-            return Ok(new Response { Message = "OK", Address=address });
+            var addresses=_addresses?.SelectAddress();
+            return Ok(new Response { Message = "OK", Addresses=addresses });
         }
     }
     
