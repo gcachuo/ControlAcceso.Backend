@@ -1,6 +1,7 @@
 using ControlAcceso.Data.Addresses;
 using ControlAcceso.Services.DBService;
 using Moq;
+using Npgsql;
 
 public class AddressesDbContextTests
 {
@@ -68,15 +69,15 @@ public void SelectAddress_ReturnsListOfAddresses_WhenDataIsValid()
 
         
         mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM addresses", It.IsAny<Dictionary<string, dynamic>>()))
-                     .Throws(new Exception("Database error"));
+                     .Throws(new PostgresException("Database error", "Severity", "invariantSeverity","sqlState"));
 
         var dbContext = new AddressesDbContext(mockDbService.Object);
 
          // Act & Assert
-        var exception = Assert.Throws<Exception>(() => dbContext.SelectAddress());
+        var exception = Assert.Throws<PostgresException>(() => dbContext.SelectAddress());
 
         // Ajustar la comparación al mensaje completo
-        Assert.Equal("Error al obtener direcciones: Database error", exception.Message);
+        Assert.Equal("sqlState: Database error", exception.Message);
             
     }
 }
