@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using ControlAcceso.Data.Addresses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ControlAcceso.Endpoints.Addresses
@@ -7,11 +8,22 @@ namespace ControlAcceso.Endpoints.Addresses
     [Route("addresses")]
     public class Endpoint : ControllerBase
     {
+        private IAddressesDbContext? _addresses { get; }
+        public Endpoint(IAddressesDbContext? addresses)
+        {
+            _addresses = addresses;
+        }
+
         [HttpPost("create")]
         public IActionResult CreateAddress([FromBody] Request request)
         {
             try
             {
+                _addresses?.InsertAddress(new()
+                {
+                    Street = request.Street,
+                    Number = request.Number,
+                });
                 return Ok(new Response { Message = "OK" });
             }
             catch (DataException e)
