@@ -22,3 +22,13 @@ create table roles
         constraint roles_pk_2
             unique
 );
+create table addresses
+(
+    id     serial  not null
+        constraint addresses_pk
+            primary key,
+    street varchar not null,
+    number varchar not null,
+    constraint addresses_pk_2
+        unique (street, number)
+);
