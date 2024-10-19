@@ -56,6 +56,7 @@ namespace ControlAcceso.Tests.Data
                     {"second_name",""},
                     {"lastname",""},
                     {"second_lastname",""},
+                    {"role_id","1"},
                 }, });
             
             //Act
