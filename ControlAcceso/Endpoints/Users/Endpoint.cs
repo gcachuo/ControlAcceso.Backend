@@ -34,7 +34,8 @@ namespace ControlAcceso.Endpoints.Users
                     SecondLastname = request.SecondSurname,
                     Password = hashedPassword,
                     PhoneNumber = request.Phone,
-                    Address = request.Address
+                    Address = request.Address,
+                    RoleId = request.RoleId
                 });
                 return Ok(new Response { Message = "OK" });
             }
@@ -52,8 +53,6 @@ namespace ControlAcceso.Endpoints.Users
             try
             {
                 
-                var hashedPassword = PasswordHasher.HashPassword(request.Password);
-                
                 var user = new UserModel
                 {
                     Email = request.Email,
@@ -61,9 +60,9 @@ namespace ControlAcceso.Endpoints.Users
                     SecondName = request.SecondName,
                     Lastname = request.FirstSurname,
                     SecondLastname = request.SecondSurname,
-                    Password = hashedPassword,
                     PhoneNumber = request.Phone,
-                    Address = request.Address
+                    Address = request.Address,
+                    RoleId = request.RoleId,
                 };
 
                 
