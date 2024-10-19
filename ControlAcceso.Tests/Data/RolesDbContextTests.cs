@@ -31,14 +31,12 @@ namespace ControlAcceso.Tests.Data
             // Arrange
             var mockDbService = new Mock<IDbService>();
 
-
             var fakeRows = new List<Dictionary<string, dynamic>>()
             {
                 new Dictionary<string, dynamic> { { "name", "Admin" }, { "id", "1" } },
                 new Dictionary<string, dynamic> { { "name", "User" }, { "id", "2" } }
             };
 
-           
             mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Roles", It.IsAny<Dictionary<string, dynamic>>()))
                         .Returns(fakeRows);
 
@@ -48,10 +46,22 @@ namespace ControlAcceso.Tests.Data
             var result = dbContext.SelectRole();
 
             // Assert
-            Assert.NotNull(result); 
-            Assert.Equal(2, result.Count()); 
-            Assert.Equal("Admin", result.First().Name); 
-            Assert.Equal("1", result.First().Id); 
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+
+            var expectedRoles = new List<(string Name, string Id)>
+            {
+                ("Admin", "1"),
+                ("User", "2")
+            };
+
+            int index = 0; 
+            foreach (var actualRole in result)
+            {
+                Assert.Equal(expectedRoles[index].Name, actualRole.Name);
+                Assert.Equal(expectedRoles[index].Id, actualRole.Id);
+                index++; 
+            }
         }
 
         [Fact]

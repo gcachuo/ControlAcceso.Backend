@@ -18,8 +18,8 @@ namespace ControlAcceso.Endpoints.Roles
         [HttpGet("")]
         public IActionResult GetRoleList()
         {
-            var role = _roles?.SelectRole();
-            return Ok(new Response {Message = "OK", Role=role});
+            var roles = _roles?.SelectRole();
+            return Ok(new Response {Message = "OK", Roles=roles});
             
         }
 

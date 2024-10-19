@@ -5,7 +5,7 @@ namespace ControlAcceso.Endpoints.Roles
     public class Response:IResponse
     {
         public string? Message { get; set; }
-        public IEnumerable<RoleModel>? Role { get; set; }
+        public IEnumerable<RoleModel>? Roles { get; set; }
         
     }
 }
