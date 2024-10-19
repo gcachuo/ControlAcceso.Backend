@@ -52,7 +52,7 @@ namespace ControlAcceso.Tests.Endpoints
 
             // Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK);
-            (result!.Value as Response)!.Role.Should().BeEquivalentTo(mockRoles); 
+            (result!.Value as Response)!.Roles.Should().BeEquivalentTo(mockRoles); 
         }
 
 
@@ -70,7 +70,7 @@ namespace ControlAcceso.Tests.Endpoints
 
             // Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK);
-            (result!.Value as Response)!.Role.Should().BeEmpty(); 
+            (result!.Value as Response)!.Roles.Should().BeEmpty(); 
         }
 
     }
