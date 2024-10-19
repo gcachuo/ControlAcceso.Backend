@@ -6,5 +6,5 @@ public interface IRolesDbContext
 {
     public void InsertRole(RoleModel role);
 
-    public IEnumerable<RoleModel> SelectRole();
+    public List<RoleModel> SelectRole();
 }

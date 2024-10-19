@@ -39,7 +39,7 @@ public class RolesDbContext:IRolesDbContext
         }
     }
 
-    public IEnumerable<RoleModel> SelectRole()
+    public List<RoleModel> SelectRole()
     {
         var rows = DbService.ExecuteReader("SELECT * FROM Roles", new Dictionary<string, dynamic>());
         var roles = new List<RoleModel>();
