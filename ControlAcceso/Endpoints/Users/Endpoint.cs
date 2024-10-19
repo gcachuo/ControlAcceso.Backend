@@ -11,17 +11,17 @@ namespace ControlAcceso.Endpoints.Users
     public class Endpoint : ControllerBase
     {
         private IUsersDbContext? _users { get; }
-        
+
         public Endpoint(IUsersDbContext? users)
         {
             _users = users;
         }
-        
+
         [HttpPost("register")]
         public IActionResult RegisterUser([FromBody] Request request)
         {
-            var hashedPassword=PasswordHasher.HashPassword(request.Password);
-            var username = $"{request.FirstName?.ToLower().Replace(" ","")}.{request.FirstSurname?.ToLower().Replace(" ","")}";
+            var hashedPassword = PasswordHasher.HashPassword(request.Password);
+            var username = $"{request.FirstName?.ToLower().Replace(" ", "")}.{request.FirstSurname?.ToLower().Replace(" ", "")}";
             try
             {
                 _users?.InsertUser(new()
@@ -46,13 +46,11 @@ namespace ControlAcceso.Endpoints.Users
         }
 
 
-        
         [HttpPatch("{idUser}")]
         public IActionResult EditUser(int idUser, [FromBody] Request request)
         {
             try
             {
-                
                 var user = new UserModel
                 {
                     Email = request.Email,
@@ -65,11 +63,11 @@ namespace ControlAcceso.Endpoints.Users
                     RoleId = request.RoleId,
                 };
 
-                
+
                 _users?.UpdateUser(user, idUser);
 
                 return Ok(new Response { Message = "Usuario actualizado correctamente" });
-                }
+            }
             catch (DataException e)
             {
                 return BadRequest(new Response { Message = e.Message });
@@ -79,8 +77,8 @@ namespace ControlAcceso.Endpoints.Users
         [HttpGet("{idUser}")]
         public IActionResult GetUser(int idUser)
         {
-            var user=_users?.SelectUser(idUser);
-            return Ok(new Response { Message = "OK", User=user });
+            var user = _users?.SelectUser(idUser);
+            return Ok(new Response { Message = "OK", User = user });
         }
     }
 }
