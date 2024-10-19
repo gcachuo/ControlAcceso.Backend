@@ -26,19 +26,18 @@ public void SelectAddress_ReturnsListOfAddresses_WhenDataIsValid()
 
     // Assert
     Assert.NotNull(result); 
-    Assert.Equal(2, result.Count()); 
+    Assert.Equal(2, result.Count());
 
-    // Verificar todas las direcciones devueltas
     var expectedAddresses = new List<(string Street, string Number)>
     {
         ("Main St", "123"),
         ("Second St", "456")
     };
 
-    for (int i = 0; i < result.Count(); i++)
+    foreach (var (expected, actual) in expectedAddresses.Zip(result, (e, a) => (e, a)))
     {
-        Assert.Equal(expectedAddresses[i].Street, result.ElementAt(i).Street);
-        Assert.Equal(expectedAddresses[i].Number, result.ElementAt(i).Number);
+        Assert.Equal(expected.Street, actual.Street);
+        Assert.Equal(expected.Number, actual.Number);
     }
 }
 

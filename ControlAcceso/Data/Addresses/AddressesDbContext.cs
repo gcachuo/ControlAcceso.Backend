@@ -19,23 +19,18 @@ namespace ControlAcceso.Data.Addresses
         {
             var addresses = new List<AddressModel>();
 
-            try
-            {
-                var rows = DbService.ExecuteReader("SELECT * FROM addresses", new Dictionary<string, dynamic>());
+            
+            var rows = DbService.ExecuteReader("SELECT * FROM addresses", new Dictionary<string, dynamic>());
 
-                foreach (var row in rows)
-                {
-                    addresses.Add(new AddressModel
-                    {
-                        Street = row["street"]?.ToString(),
-                        Number = row["number"]?.ToString() 
-                    });
-                }
-            }
-            catch (Exception e)
+            foreach (var row in rows)
             {
-                throw new Exception($"Error al obtener direcciones: {e.Message}");
+                addresses.Add(new AddressModel
+                {
+                    Street = row["street"]?.ToString(),
+                    Number = row["number"]?.ToString() 
+                });
             }
+           
 
             return addresses;
         }
