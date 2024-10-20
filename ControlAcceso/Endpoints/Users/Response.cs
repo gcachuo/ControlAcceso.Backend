@@ -6,5 +6,8 @@ namespace ControlAcceso.Endpoints.Users
     {
         public string? Message { get; set; }
         public UserModel? User { get; set; }
+
+        public List<UserModel>? Users { get; set; }
+
     }
 }
