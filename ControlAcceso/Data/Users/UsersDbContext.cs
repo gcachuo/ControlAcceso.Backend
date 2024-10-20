@@ -101,5 +101,26 @@ namespace ControlAcceso.Data.Users
             };
         }
 
+        public List<UserModel> SelectUserList()
+    {
+        var rows = DbService.ExecuteReader("SELECT * FROM Users", new Dictionary<string, dynamic>());
+        var users = new List<UserModel>();
+
+        foreach (var row in rows)
+        {
+            users.Add(new UserModel
+            {
+                Address = row["address"]?.ToString(),
+                PhoneNumber = row["phone_number"]?.ToString(),
+                FirstName = row["firstname"]?.ToString(),
+                SecondName = row["second_name"]?.ToString(),
+                Lastname = row["lastname"]?.ToString(),
+                SecondLastname = row["second_lastname"]?.ToString(),
+            });
+        }
+
+        return users;
+    }
+
     }
 }

@@ -38,4 +38,21 @@ public class RolesDbContext:IRolesDbContext
             throw;
         }
     }
+
+    public List<RoleModel> SelectRole()
+    {
+        var rows = DbService.ExecuteReader("SELECT * FROM Roles", new Dictionary<string, dynamic>());
+        var roles = new List<RoleModel>();
+
+        foreach (var row in rows)
+        {
+            roles.Add(new RoleModel
+            {
+                Name = row["name"]?.ToString(),
+                Id = row["id"]?.ToString()
+            });
+        }
+
+        return roles;
+    }
 }

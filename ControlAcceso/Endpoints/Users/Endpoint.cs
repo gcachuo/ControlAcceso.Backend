@@ -16,7 +16,15 @@ namespace ControlAcceso.Endpoints.Users
         {
             _users = users;
         }
-        
+
+        [HttpGet]
+        public IActionResult GetUserList()
+        {
+            var users = _users?.SelectUserList();
+            return Ok(new Response {Message = "OK", Users=users});
+            
+        }
+
         [HttpPost("register")]
         public IActionResult RegisterUser([FromBody] Request request)
         {
