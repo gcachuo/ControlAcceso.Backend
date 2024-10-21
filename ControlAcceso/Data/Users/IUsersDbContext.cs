@@ -8,6 +8,10 @@ namespace ControlAcceso.Data.Users
 
         public void InsertUser(UserModel user);
         
-        public UserModel SelectUser(int id);
+        public UserModel? SelectUser(int id);
+        
+        public UserModel? SelectUser(string username);
+        
+        public string? SelectPassword(string? username);
     }
 }

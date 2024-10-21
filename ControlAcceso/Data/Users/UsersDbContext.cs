@@ -74,11 +74,10 @@ namespace ControlAcceso.Data.Users
                     { "@Address", user.Address },
                     { "@RoleId", user.RoleId }
                 });
-            }   
-            catch (PostgresException e)
+            }
+            finally
             {
-            
-                throw;
+                
             }
         }
 
@@ -101,5 +100,31 @@ namespace ControlAcceso.Data.Users
             };
         }
 
+        public UserModel? SelectUser(string username)
+        {
+            var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where username=@username or email=@username or phone_number=@username", new() { { "@username", username } }).SingleOrDefault();
+            if (row == null)
+                return null;
+            return new()
+            {
+                Id = row["id"] as int?,
+                Role = row["role"].ToString(),
+                Address = row["address"]?.ToString(),
+                PhoneNumber = row["phone_number"]?.ToString(),
+                Username = row["username"]?.ToString(),
+                Email = row["email"]?.ToString(),
+                FirstName = row["firstname"]?.ToString(),
+                SecondName = row["second_name"]?.ToString(),
+                Lastname = row["lastname"]?.ToString(),
+                SecondLastname = row["second_lastname"]?.ToString(),
+            };
+        }
+
+        public string? SelectPassword(string? username)
+        {
+           var row=DbService.ExecuteReader("SELECT password FROM Users where username=@username or email=@username or phone_number=@username", 
+               new() { { "@username", username } }).SingleOrDefault();
+           return row?["password"].ToString();
+        }
     }
 }
