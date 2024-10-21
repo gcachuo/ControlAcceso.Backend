@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+    <RunConfiguration>
+        <EnvironmentVariables>
+            <JWT_SIGNING_KEY>clave_super_segura_con_mas_de_32_caracteres</JWT_SIGNING_KEY>
+            <JWT_ISSUER>JWT_ISSUER</JWT_ISSUER>
+            <JWT_AUDIENCE>JWT_AUDIENCE</JWT_AUDIENCE>
+        </EnvironmentVariables>
+    </RunConfiguration>
+</RunSettings>

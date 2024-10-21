@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using ControlAcceso.Data.Model;
 using ControlAcceso.Services.DBService;
 using Npgsql;
@@ -12,6 +12,26 @@ namespace ControlAcceso.Data.Addresses
         public AddressesDbContext(IDbService dbService)
         {
             _dbService = dbService;
+        }
+
+        public List<AddressModel> SelectAddress()
+        {
+            var addresses = new List<AddressModel>();
+
+            
+            var rows = _dbService.ExecuteReader("SELECT * FROM addresses", new Dictionary<string, dynamic>());
+
+            foreach (var row in rows)
+            {
+                addresses.Add(new AddressModel
+                {
+                    Street = row["street"]?.ToString(),
+                    Number = row["number"]?.ToString() 
+                });
+            }
+           
+
+            return addresses;
         }
 
         public void InsertAddress(AddressModel address)

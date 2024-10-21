@@ -1,4 +1,4 @@
-﻿namespace ControlAcceso.Endpoints.Addresses
+namespace ControlAcceso.Endpoints.Addresses
 {
     public class Request
     {

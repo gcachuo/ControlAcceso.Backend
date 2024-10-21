@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using ControlAcceso.Data.Addresses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +12,13 @@ namespace ControlAcceso.Endpoints.Addresses
         public Endpoint(IAddressesDbContext? addresses)
         {
             _addresses = addresses;
+        }
+
+        [HttpGet]
+         public IActionResult GetAddress()
+        {
+            var addresses=_addresses?.SelectAddress();
+            return Ok(new Response { Message = "OK", Addresses=addresses });
         }
 
         [HttpPost("create")]
