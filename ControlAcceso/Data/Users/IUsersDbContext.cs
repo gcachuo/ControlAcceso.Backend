@@ -7,8 +7,11 @@ namespace ControlAcceso.Data.Users
         public void UpdateUser(UserModel user, int idUser); 
 
         public void InsertUser(UserModel user);
+        
         public UserModel? SelectUser(int id);
+        
         public UserModel? SelectUser(string username);
+        
         public string? SelectPassword(string? username);
     }
 }

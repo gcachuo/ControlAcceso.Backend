@@ -27,6 +27,16 @@ create table roles
         constraint roles_pk_2
             unique
 );
+create table addresses
+(
+    id serial 
+        constraint addresses_pk
+            primary key,
+    street varchar not null,
+    number varchar not null,
+    constraint unique_address
+        unique (street, number)
+);
 create table refresh_tokens
 (
     id           serial
