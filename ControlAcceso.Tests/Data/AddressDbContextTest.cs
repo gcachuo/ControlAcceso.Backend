@@ -80,4 +80,22 @@ public void SelectAddress_ReturnsListOfAddresses_WhenDataIsValid()
         Assert.Equal("sqlState: Database error", exception.Message);
             
     }
+
+    [Fact]
+    public void SelectAddress_ThrowsException_WhenDbServiceFails()
+    {
+        // Arrange
+        var mockDbService = new Mock<IDbService>();
+
+        mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM addresses", It.IsAny<Dictionary<string, dynamic>>() ))
+                    .Throws(new Exception("Simulated database failure"));
+
+        var dbContext = new AddressesDbContext(mockDbService.Object);
+
+        // Act & Assert
+        var exception = Assert.Throws<Exception>(() => dbContext.SelectAddress());
+
+        Assert.Equal("Simulated database failure", exception.Message);
+    }
+
 }
