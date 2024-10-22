@@ -27,12 +27,12 @@ namespace ControlAcceso.Endpoints.Users
             _refreshTokens = refreshTokens;
             _httpContext = httpContext;
         }
-        
+
         [HttpPost("register")]
         public IActionResult RegisterUser([FromBody] UserRequest request)
         {
-            var hashedPassword=PasswordHasher.HashPassword(request.Password);
-            var username = $"{request.FirstName?.ToLower().Replace(" ","")}.{request.FirstSurname?.ToLower().Replace(" ","")}";
+            var hashedPassword = PasswordHasher.HashPassword(request.Password);
+            var username = $"{request.FirstName?.ToLower().Replace(" ", "")}.{request.FirstSurname?.ToLower().Replace(" ", "")}";
             try
             {
                 _users?.InsertUser(new()
@@ -57,13 +57,11 @@ namespace ControlAcceso.Endpoints.Users
         }
 
 
-        
         [HttpPatch("{idUser}")]
         public IActionResult EditUser(int idUser, [FromBody] UserRequest request)
         {
             try
             {
-                
                 var user = new UserModel
                 {
                     Email = request.Email,
@@ -76,7 +74,7 @@ namespace ControlAcceso.Endpoints.Users
                     RoleId = request.RoleId,
                 };
 
-                
+
                 _users?.UpdateUser(user, idUser);
 
                 return Ok(new UserResponse { Message = "Usuario actualizado correctamente" });

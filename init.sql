@@ -29,7 +29,7 @@ create table roles
 );
 create table addresses
 (
-    id serial 
+    id     serial  not null
         constraint addresses_pk
             primary key,
     street varchar not null,

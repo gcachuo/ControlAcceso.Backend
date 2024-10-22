@@ -1,5 +1,6 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using ControlAcceso.Data.Addresses;
 using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
@@ -23,7 +24,8 @@ namespace ControlAcceso
                 .AddScoped<IDbConnection, NpgsqlConnection>()
                 .AddScoped<IRefreshTokensDbContext, RefreshTokensDbContext>()
                 .AddScoped<IUsersDbContext, UsersDbContext>()
-                .AddScoped<IRolesDbContext, RolesDbContext>();
+                .AddScoped<IRolesDbContext, RolesDbContext>()
+                .AddScoped<IAddressesDbContext, AddressesDbContext>();
             
             // Inyectar la configuración para obtener el connection string
             builder.Services.AddTransient<IDbConnection>(sp =>

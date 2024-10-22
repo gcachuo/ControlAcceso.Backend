@@ -4,7 +4,9 @@ namespace ControlAcceso.Data.Addresses
 {
     public interface IAddressesDbContext
     {
-        IEnumerable<AddressModel> SelectAddress(); 
+        public List<AddressModel> SelectAddress();
+        
+        public void InsertAddress(AddressModel address);
     }
 
 }
