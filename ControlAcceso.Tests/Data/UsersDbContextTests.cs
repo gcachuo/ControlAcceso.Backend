@@ -147,5 +147,28 @@ namespace ControlAcceso.Tests.Data
             }
         }
 
+         [Fact]
+        public void SelectPassword_ReturnsPassword_WhenUserExists()
+        {
+            // Arrange
+            var mockDbService = new Mock<IDbService>();
+            var fakeRow = new Dictionary<string, dynamic> { { "password", "password123" } };
+
+            mockDbService.Setup(db => db.ExecuteReader(
+                "SELECT password FROM Users where username=@username or email=@username or phone_number=@username",
+                It.IsAny<Dictionary<string, dynamic>>()))
+                .Returns(new List<Dictionary<string, dynamic>> { fakeRow });
+
+            var dbContext = new UsersDbContext(mockDbService.Object);
+            string username = "user1";
+
+            // Act
+            var result = dbContext.SelectPassword(username);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("password123", result);
+        }
+
     }
 }
