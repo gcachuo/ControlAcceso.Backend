@@ -39,8 +39,10 @@ namespace ControlAcceso.Tests.Data
            _dbServiceMock.Verify(x=>x.ExecuteNonQuery(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
         }
 
-        [Fact]
-        public void Should_Select_User()
+        [Theory]
+        [InlineData(1)]
+        [InlineData("username")]
+        public void Should_Select_User(dynamic username)
         {
             //Arrange
             //Mock
@@ -56,11 +58,13 @@ namespace ControlAcceso.Tests.Data
                     {"second_name",""},
                     {"lastname",""},
                     {"second_lastname",""},
+                    {"role","Administrador"},
+                    {"role_id","1"},
                 }, });
             
             //Act
             var context = new UsersDbContext(_dbServiceMock.Object);
-            context.SelectUser(1);
+            context.SelectUser(username);
 
             //Assert
             _dbServiceMock.Verify(x=>x.ExecuteReader(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()));
