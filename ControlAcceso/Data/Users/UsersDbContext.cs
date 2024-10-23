@@ -100,6 +100,7 @@ namespace ControlAcceso.Data.Users
             };
         }
 
+        
         public UserModel? SelectUser(string username)
         {
             var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where username=@username or email=@username or phone_number=@username", new() { { "@username", username } }).SingleOrDefault();
@@ -126,5 +127,27 @@ namespace ControlAcceso.Data.Users
                new() { { "@username", username } }).SingleOrDefault();
            return row?["password"].ToString();
         }
+
+        public List<UserModel> SelectUserList()
+    {
+        var rows = DbService.ExecuteReader("SELECT * FROM Users", new Dictionary<string, dynamic>());
+        var users = new List<UserModel>();
+
+        foreach (var row in rows)
+        {
+            users.Add(new UserModel
+            {
+                Address = row["address"]?.ToString(),
+                PhoneNumber = row["phone_number"]?.ToString(),
+                FirstName = row["firstname"]?.ToString(),
+                SecondName = row["second_name"]?.ToString(),
+                Lastname = row["lastname"]?.ToString(),
+                SecondLastname = row["second_lastname"]?.ToString(),
+            });
+        }
+
+        return users;
+    }
+
     }
 }

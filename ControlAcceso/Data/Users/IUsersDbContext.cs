@@ -13,5 +13,7 @@ namespace ControlAcceso.Data.Users
         public UserModel? SelectUser(string username);
         
         public string? SelectPassword(string? username);
+
+        public List<UserModel> SelectUserList();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using ControlAcceso.Data.Users;
@@ -26,6 +25,14 @@ namespace ControlAcceso.Endpoints.Users
             _users = users;
             _refreshTokens = refreshTokens;
             _httpContext = httpContext;
+        }
+
+        [HttpGet]
+        public IActionResult GetUserList()
+        {
+            var users = _users?.SelectUserList();
+            return Ok(new UserResponse {Message = "OK", Users=users});
+            
         }
 
         [HttpPost("register")]
