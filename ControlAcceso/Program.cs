@@ -1,8 +1,11 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using ControlAcceso.Data.Addresses;
+using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
+using ControlAcceso.Tools.HttpContext;
 using Npgsql;
 
 namespace ControlAcceso
@@ -17,9 +20,12 @@ namespace ControlAcceso
             builder.Services.AddOpenApi();
             
             builder.Services
+                .AddScoped<IHttpContext, Tools.HttpContext.HttpContext>()
                 .AddScoped<IDbConnection, NpgsqlConnection>()
+                .AddScoped<IRefreshTokensDbContext, RefreshTokensDbContext>()
                 .AddScoped<IUsersDbContext, UsersDbContext>()
-                .AddScoped<IRolesDbContext, RolesDbContext>();
+                .AddScoped<IRolesDbContext, RolesDbContext>()
+                .AddScoped<IAddressesDbContext, AddressesDbContext>();
             
             // Inyectar la configuración para obtener el connection string
             builder.Services.AddTransient<IDbConnection>(sp =>
@@ -58,6 +64,8 @@ namespace ControlAcceso
             app.MapControllers();
             
             app.UseCors("AllowAllOrigins");
+            
+            DotNetEnv.Env.Load();
 
             app.Run();
         }
