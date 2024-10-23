@@ -87,15 +87,16 @@ public void SelectAddress_ReturnsListOfAddresses_WhenDataIsValid()
         // Arrange
         var mockDbService = new Mock<IDbService>();
 
-        mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM addresses", It.IsAny<Dictionary<string, dynamic>>() ))
-                    .Throws(new Exception("Simulated database failure"));
+        mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM addresses", It.IsAny<Dictionary<string, dynamic>>()))
+                    .Throws(new PostgresException("Simulated database failure", "Severity", "invariantSeverity", "sqlState"));
 
         var dbContext = new AddressesDbContext(mockDbService.Object);
 
         // Act & Assert
-        var exception = Assert.Throws<Exception>(() => dbContext.SelectAddress());
+        var exception = Assert.Throws<PostgresException>(() => dbContext.SelectAddress());
 
-        Assert.Equal("Simulated database failure", exception.Message);
+        Assert.Equal("sqlState: Simulated database failure", exception.Message);
     }
+
 
 }
