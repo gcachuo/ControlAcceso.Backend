@@ -15,5 +15,7 @@ namespace ControlAcceso.Data.Users
         public string? SelectPassword(string? username);
 
         public List<UserModel> SelectUserList();
+
+        public void DisableUser(int idUser);
     }
 }
