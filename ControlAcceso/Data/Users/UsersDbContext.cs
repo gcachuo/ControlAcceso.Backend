@@ -131,10 +131,20 @@ namespace ControlAcceso.Data.Users
         public List<UserModel> SelectUserList()
         {
             var rows = DbService.ExecuteReader("SELECT * FROM Users WHERE enable = 1", new Dictionary<string, dynamic>());
+            if (rows == null)
+            {
+                throw new DataException("No se encontraron usuarios activos."); 
+            }
+
             var users = new List<UserModel>();
 
             foreach (var row in rows)
             {
+                if (row == null)
+                {
+                    continue; 
+                }
+
                 users.Add(new UserModel
                 {
                     Address = row["address"]?.ToString(),
@@ -154,7 +164,6 @@ namespace ControlAcceso.Data.Users
             var updateQuery = "UPDATE Users SET enable = 0 WHERE id = @IdUser";
             DbService.ExecuteNonQuery(updateQuery, new() { { "@IdUser", idUser } });
         }
-
 
     }
 }
