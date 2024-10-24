@@ -103,7 +103,7 @@ namespace ControlAcceso.Data.Users
         
         public UserModel? SelectUser(string username)
         {
-            var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where username=@username or email=@username or phone_number=@username", new() { { "@username", username } }).SingleOrDefault();
+            var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where (username=@username or email=@username or phone_number=@username) AND enable = 1", new() { { "@username", username } }).SingleOrDefault();
             if (row == null)
                 return null;
             return new()
@@ -129,25 +129,32 @@ namespace ControlAcceso.Data.Users
         }
 
         public List<UserModel> SelectUserList()
-    {
-        var rows = DbService.ExecuteReader("SELECT * FROM Users", new Dictionary<string, dynamic>());
-        var users = new List<UserModel>();
-
-        foreach (var row in rows)
         {
-            users.Add(new UserModel
+            var rows = DbService.ExecuteReader("SELECT * FROM Users WHERE enable = 1", new Dictionary<string, dynamic>());
+            var users = new List<UserModel>();
+
+            foreach (var row in rows)
             {
-                Address = row["address"]?.ToString(),
-                PhoneNumber = row["phone_number"]?.ToString(),
-                FirstName = row["firstname"]?.ToString(),
-                SecondName = row["second_name"]?.ToString(),
-                Lastname = row["lastname"]?.ToString(),
-                SecondLastname = row["second_lastname"]?.ToString(),
-            });
+                users.Add(new UserModel
+                {
+                    Address = row["address"]?.ToString(),
+                    PhoneNumber = row["phone_number"]?.ToString(),
+                    FirstName = row["firstname"]?.ToString(),
+                    SecondName = row["second_name"]?.ToString(),
+                    Lastname = row["lastname"]?.ToString(),
+                    SecondLastname = row["second_lastname"]?.ToString(),
+                });
+            }
+
+            return users;
         }
 
-        return users;
-    }
+        public void DisableUser(int idUser)
+        {
+            var updateQuery = "UPDATE Users SET enable = 0 WHERE id = @IdUser";
+            DbService.ExecuteNonQuery(updateQuery, new() { { "@IdUser", idUser } });
+        }
+
 
     }
 }

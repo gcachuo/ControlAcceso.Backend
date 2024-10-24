@@ -15,6 +15,7 @@
         constraint users_roles_id_fk
             references roles
             on update cascade on delete cascade,
+    enable          BOOLEAN DEFAULT TRUE, 
     constraint users_pk
         unique (address, phone_number)
 );
