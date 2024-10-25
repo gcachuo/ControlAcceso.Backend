@@ -25,6 +25,8 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
+      run: dotnet test --settings:".runsettings"
+    - name: Check coverage
       run: dotnet test --settings:".runsettings" --collect:"XPlat Code Coverage" --logger "trx;LogFileName=TestResults.trx" --no-build --verbosity normal
     - name: Dotnet Test Reporter
       uses: bibipkins/dotnet-test-reporter@v1.4.1
