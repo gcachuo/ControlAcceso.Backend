@@ -150,11 +150,12 @@ namespace ControlAcceso.Tests.Data
         public void SelectPassword_ReturnsPassword_WhenUserExists()
         {
             // Arrange
+            
             var mockDbService = new Mock<IDbService>();
             var fakeRow = new Dictionary<string, dynamic> { { "password", "password123" } };
 
             mockDbService.Setup(db => db.ExecuteReader(
-                "SELECT password FROM Users where username=@username or email=@username or phone_number=@username",
+                "SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = 1",
                 It.IsAny<Dictionary<string, dynamic>>()))
                 .Returns(new List<Dictionary<string, dynamic>> { fakeRow });
 
