@@ -8,15 +8,6 @@ namespace ControlAcceso.Tests.Data
     public class UsersDbContextTests
     {
         private Mock<IDbService> _dbServiceMock = new(MockBehavior.Default);
-        private Mock<IDbService> _mockDbService;
-        private UsersDbContext _usersDbContext;
-
-        public UsersDbContextTests()
-        {
-        
-            _mockDbService = new Mock<IDbService>();
-            _usersDbContext = new UsersDbContext(_mockDbService.Object);
-        }
 
         [Fact]
         public void Should_Insert_User()
@@ -107,7 +98,7 @@ namespace ControlAcceso.Tests.Data
                 }
             };
 
-            mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Users WHERE enable = 1", It.IsAny<Dictionary<string, dynamic>>()))
+            mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Users WHERE enabled = 1", It.IsAny<Dictionary<string, dynamic>>()))
                         .Returns(fakeRows);
 
             var dbContext = new UsersDbContext(mockDbService.Object);
@@ -184,14 +175,19 @@ namespace ControlAcceso.Tests.Data
             // Arrange
             int userId = 1;
 
+            //Mock
+            //No se necesita mock
+
             // Act
-            _usersDbContext.DisableUser(userId);
+            var context = new UsersDbContext(_dbServiceMock.Object);
+            context.DisableUser(userId);
 
             // Assert
-            _mockDbService.Verify(db => db.ExecuteNonQuery(
-                "UPDATE Users SET enable = 0 WHERE id = @IdUser",
+            _dbServiceMock.Verify(db => db.ExecuteNonQuery(
+                "UPDATE Users SET enabled = 0 WHERE id = @IdUser",
                 It.Is<Dictionary<string, object>>(d => d["@IdUser"].Equals(userId))
             ), Times.Once);
+            
         }
 
     }
