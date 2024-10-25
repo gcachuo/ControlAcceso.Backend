@@ -103,7 +103,7 @@ namespace ControlAcceso.Data.Users
         
         public UserModel? SelectUser(string username)
         {
-            var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where (username=@username or email=@username or phone_number=@username) AND enable = 1", new() { { "@username", username } }).SingleOrDefault();
+            var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where (username=@username or email=@username or phone_number=@username) AND enabled = 1", new() { { "@username", username } }).SingleOrDefault();
             if (row == null)
                 return null;
             return new()
@@ -120,17 +120,17 @@ namespace ControlAcceso.Data.Users
                 SecondLastname = row["second_lastname"]?.ToString(),
             };
         }
-
+        //TODO: Agregar enabled en todos los select
         public string? SelectPassword(string? username)
         {
-           var row=DbService.ExecuteReader("SELECT password FROM Users where username=@username or email=@username or phone_number=@username", 
+           var row=DbService.ExecuteReader("SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = 1", 
                new() { { "@username", username } }).SingleOrDefault();
            return row?["password"].ToString();
         }
 
         public List<UserModel> SelectUserList()
         {
-            var rows = DbService.ExecuteReader("SELECT * FROM Users WHERE enable = 1", new Dictionary<string, dynamic>());
+            var rows = DbService.ExecuteReader("SELECT * FROM Users WHERE enabled = 1", new Dictionary<string, dynamic>());
             if (rows == null)
             {
                 throw new DataException("No se encontraron usuarios activos."); 
@@ -140,11 +140,6 @@ namespace ControlAcceso.Data.Users
 
             foreach (var row in rows)
             {
-                if (row == null)
-                {
-                    continue; 
-                }
-
                 users.Add(new UserModel
                 {
                     Address = row["address"]?.ToString(),
@@ -161,7 +156,7 @@ namespace ControlAcceso.Data.Users
 
         public void DisableUser(int idUser)
         {
-            var updateQuery = "UPDATE Users SET enable = 0 WHERE id = @IdUser";
+            var updateQuery = "UPDATE Users SET enabled = 0 WHERE id = @IdUser";
             DbService.ExecuteNonQuery(updateQuery, new() { { "@IdUser", idUser } });
         }
 

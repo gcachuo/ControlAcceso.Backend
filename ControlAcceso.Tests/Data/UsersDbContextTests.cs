@@ -174,7 +174,7 @@ namespace ControlAcceso.Tests.Data
         public void DisableUser_When_User_Is_Disabled()
         {
             // Arrange
-            int userId = 1;
+            int userId = 0;
 
             //Mock
             //No se necesita mock
