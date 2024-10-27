@@ -157,11 +157,11 @@ namespace ControlAcceso.Endpoints.Users
             try
             {
                 _users?.DisableUser(idUser);
-                return Ok(new UserResponse { Message = "Usuario desactivado correctamente" });
+                return Ok(new UserDelete { Message = "Usuario desactivado correctamente" });
             }
             catch (DataException e)
             {
-                return BadRequest(new UserResponse { Message = e.Message });
+                return BadRequest(new UserDelete { Message = e.Message });
             }
         }
 
