@@ -156,7 +156,7 @@ namespace ControlAcceso.Tests.Endpoints
             // Assert
             Assert.NotNull(result);
             Assert.Equal(200, result.StatusCode);
-            Assert.Equal("Usuario desactivado correctamente", ((UserResponse)result.Value).Message);
+            Assert.Equal("Usuario desactivado correctamente", ((UserDelete)result.Value).Message);
             _mockUsersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
         }
 
@@ -173,7 +173,7 @@ namespace ControlAcceso.Tests.Endpoints
             // Assert
             Assert.NotNull(result);
             Assert.Equal(400, result.StatusCode);
-            Assert.Equal("Error al desactivar el usuario", ((UserResponse)result.Value).Message);
+            Assert.Equal("Error al desactivar el usuario", ((UserDelete)result.Value).Message);
             _mockUsersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
         }
     }

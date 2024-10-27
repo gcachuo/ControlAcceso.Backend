@@ -98,7 +98,7 @@ namespace ControlAcceso.Tests.Data
                 }
             };
 
-            mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Users WHERE enabled = 1", It.IsAny<Dictionary<string, dynamic>>()))
+            mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Users WHERE enabled = TRUE", It.IsAny<Dictionary<string, dynamic>>()))
                         .Returns(fakeRows);
 
             var dbContext = new UsersDbContext(mockDbService.Object);
@@ -155,7 +155,7 @@ namespace ControlAcceso.Tests.Data
             var fakeRow = new Dictionary<string, dynamic> { { "password", "password123" } };
 
             mockDbService.Setup(db => db.ExecuteReader(
-                "SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = 1",
+                "SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = TRUE",
                 It.IsAny<Dictionary<string, dynamic>>()))
                 .Returns(new List<Dictionary<string, dynamic>> { fakeRow });
 
@@ -174,7 +174,7 @@ namespace ControlAcceso.Tests.Data
         public void DisableUser_When_User_Is_Disabled()
         {
             // Arrange
-            int userId = 0;
+            int userId =    1;
 
             //Mock
             //No se necesita mock
@@ -185,7 +185,7 @@ namespace ControlAcceso.Tests.Data
 
             // Assert
             _dbServiceMock.Verify(db => db.ExecuteNonQuery(
-                "UPDATE Users SET enabled = 0 WHERE id = @IdUser",
+                "UPDATE Users SET enabled = FALSE WHERE id = @IdUser",
                 It.Is<Dictionary<string, object>>(d => d["@IdUser"].Equals(userId))
             ), Times.Once);
             
