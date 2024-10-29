@@ -19,14 +19,6 @@ namespace ControlAcceso.Tests.Endpoints
         private readonly Mock<IRefreshTokensDbContext> _refreshTokensDbContext = new(MockBehavior.Strict);
         private readonly Mock<IHttpContext> _httpContext = new(MockBehavior.Strict);
 
-        private readonly Endpoint _controller;
-    private readonly Mock<IUsersDbContext> _mockUsersDbContext;
-
-    public UsersTests()
-    {
-        _mockUsersDbContext = new Mock<IUsersDbContext>();
-        _controller = new Endpoint(_mockUsersDbContext.Object,null,null);
-    }
 
         [Fact]
         public void Should_Register_User_Successfully()
@@ -148,16 +140,17 @@ namespace ControlAcceso.Tests.Endpoints
         {
             // Arrange
             int userId = 1;
-            _mockUsersDbContext.Setup(db => db.DisableUser(userId)).Verifiable();
+            _usersDbContext.Setup(db => db.DisableUser(userId)).Verifiable();
 
             // Act
-            var result = _controller.DeleteUser(userId) as OkObjectResult;
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var result = endpoint.DeleteUser(userId) as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(200, result.StatusCode);
             Assert.Equal("Usuario desactivado correctamente", ((UserDelete)result.Value).Message);
-            _mockUsersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
+            _usersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
         }
 
         [Fact]
@@ -165,16 +158,17 @@ namespace ControlAcceso.Tests.Endpoints
         {
             // Arrange
             int userId = 1;
-            _mockUsersDbContext.Setup(db => db.DisableUser(userId)).Throws(new DataException("Error al desactivar el usuario"));
+            _usersDbContext.Setup(db => db.DisableUser(userId)).Throws(new DataException("Error al desactivar el usuario"));
 
             // Act
-            var result = _controller.DeleteUser(userId) as BadRequestObjectResult;
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var result = endpoint.DeleteUser(userId) as BadRequestObjectResult;
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(400, result.StatusCode);
             Assert.Equal("Error al desactivar el usuario", ((UserDelete)result.Value).Message);
-            _mockUsersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
+            _usersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
         }
     }
 }

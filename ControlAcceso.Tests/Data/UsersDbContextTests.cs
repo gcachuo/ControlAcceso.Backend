@@ -171,7 +171,7 @@ namespace ControlAcceso.Tests.Data
         }
 
          [Fact]
-        public void DisableUser_When_User_Is_Disabled()
+        public void DisableUser()
         {
             // Arrange
             int userId =    1;
