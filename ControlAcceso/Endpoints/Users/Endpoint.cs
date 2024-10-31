@@ -150,5 +150,20 @@ namespace ControlAcceso.Endpoints.Users
                 return Convert.ToBase64String(randomNumber);
             }
         }
+
+        [HttpDelete("{idUser}")]
+        public IActionResult DeleteUser(int idUser)
+        {
+            try
+            {
+                _users?.DisableUser(idUser);
+                return Ok(new UserDelete { Message = "Usuario desactivado correctamente" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new UserDelete { Message = e.Message });
+            }
+        }
+
     }
 }

@@ -28,10 +28,7 @@ namespace ControlAcceso.Endpoints.Roles
         {
             try
             {
-                _roles?.InsertRole(new()
-                {
-                    Name = request.Name,
-                });
+                _roles?.InsertRole(new(){Name = request.Name,});
                 return Ok(new Response { Message = "OK" });
             }
             catch (DataException e)

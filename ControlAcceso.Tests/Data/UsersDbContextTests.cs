@@ -98,7 +98,7 @@ namespace ControlAcceso.Tests.Data
                 }
             };
 
-            mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Users", It.IsAny<Dictionary<string, dynamic>>()))
+            mockDbService.Setup(db => db.ExecuteReader("SELECT * FROM Users WHERE enabled = TRUE", It.IsAny<Dictionary<string, dynamic>>()))
                         .Returns(fakeRows);
 
             var dbContext = new UsersDbContext(mockDbService.Object);
@@ -120,7 +120,6 @@ namespace ControlAcceso.Tests.Data
                     SecondName = "Jesus",
                     Lastname = "Perez",
                     SecondLastname = "Perez"
-
                 },
                 new UserModel
                 {
@@ -130,7 +129,6 @@ namespace ControlAcceso.Tests.Data
                     SecondName = "Andres",
                     Lastname = "Ornelas",
                     SecondLastname = "Cervantes"
-                
                 }
             };
 
@@ -147,15 +145,17 @@ namespace ControlAcceso.Tests.Data
             }
         }
 
+
          [Fact]
         public void SelectPassword_ReturnsPassword_WhenUserExists()
         {
             // Arrange
+            
             var mockDbService = new Mock<IDbService>();
             var fakeRow = new Dictionary<string, dynamic> { { "password", "password123" } };
 
             mockDbService.Setup(db => db.ExecuteReader(
-                "SELECT password FROM Users where username=@username or email=@username or phone_number=@username",
+                "SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = TRUE",
                 It.IsAny<Dictionary<string, dynamic>>()))
                 .Returns(new List<Dictionary<string, dynamic>> { fakeRow });
 
@@ -168,6 +168,27 @@ namespace ControlAcceso.Tests.Data
             // Assert
             Assert.NotNull(result);
             Assert.Equal("password123", result);
+        }
+
+         [Fact]
+        public void Should_Update_User_To_Disabled_When_User_Is_Active()
+        {
+            // Arrange
+            int userId =    1;
+
+            //Mock
+            //No se necesita mock
+
+            // Act
+            var context = new UsersDbContext(_dbServiceMock.Object);
+            context.DisableUser(userId);
+
+            // Assert
+            _dbServiceMock.Verify(db => db.ExecuteNonQuery(
+                "UPDATE Users SET enabled = FALSE WHERE id = @IdUser",
+                It.Is<Dictionary<string, object>>(d => d["@IdUser"].Equals(userId))
+            ), Times.Once);
+            
         }
 
     }

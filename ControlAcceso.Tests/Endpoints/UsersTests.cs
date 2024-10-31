@@ -19,6 +19,7 @@ namespace ControlAcceso.Tests.Endpoints
         private readonly Mock<IRefreshTokensDbContext> _refreshTokensDbContext = new(MockBehavior.Strict);
         private readonly Mock<IHttpContext> _httpContext = new(MockBehavior.Strict);
 
+
         [Fact]
         public void Should_Register_User_Successfully()
         {
@@ -132,6 +133,42 @@ namespace ControlAcceso.Tests.Endpoints
             //Assert
             result?.StatusCode.Should().Be(StatusCodes.Status200OK, result.Value?.ToString());
             (result!.Value as LoginResponse)!.Message.Should().Be("OK");
+        }
+
+        [Fact]
+        public void DeleteUser_ShouldReturnOk_WhenUserIsDisabledSuccessfully()
+        {
+            // Arrange
+            int userId = 1;
+            _usersDbContext.Setup(db => db.DisableUser(userId)).Verifiable();
+
+            // Act
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var result = endpoint.DeleteUser(userId) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            Assert.Equal("Usuario desactivado correctamente", ((UserDelete)result.Value).Message);
+            _usersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteUser_ShouldReturnBadRequest_WhenExceptionIsThrown()
+        {
+            // Arrange
+            int userId = 1;
+            _usersDbContext.Setup(db => db.DisableUser(userId)).Throws(new DataException("Error al desactivar el usuario"));
+
+            // Act
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var result = endpoint.DeleteUser(userId) as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal("Error al desactivar el usuario", ((UserDelete)result.Value).Message);
+            _usersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
         }
     }
 }
