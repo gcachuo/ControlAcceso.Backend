@@ -31,20 +31,23 @@ namespace ControlAcceso.Tests.Data
             var user = new UserModel(){RoleId = 0};
 
             //Mock
-            _dbServiceMock.Setup(x=>x.ExecuteReader("SELECT * FROM Users where id=@id",It.IsAny<Dictionary<string,dynamic>>()))
-                .Returns(new List<Dictionary<string, object>>(){new()
-                {
-                    {"id",idUser},
-                    {"address",""},
-                    {"phone_number",""},
-                    {"username",""},
-                    {"email",""},
-                    {"firstname",""},
-                    {"second_name",""},
-                    {"lastname",""},
-                    {"second_lastname",""},
-                    {"role_id","0"},
-                }});
+            _dbServiceMock.Setup(x=>x.ExecuteReader(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()))
+                .Returns([
+                    new()
+                    {
+                        { "id", idUser },
+                        { "address", "" },
+                        { "phone_number", "" },
+                        { "username", "" },
+                        { "email", "" },
+                        { "firstname", "" },
+                        { "second_name", "" },
+                        { "lastname", "" },
+                        { "second_lastname", "" },
+                        { "role_id", "0" },
+                        { "role", "" },
+                    }
+                ]);
 
             //Act
             var context = new UsersDbContext(_dbServiceMock.Object);
