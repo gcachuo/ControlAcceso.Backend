@@ -62,17 +62,18 @@ namespace ControlAcceso.Data.Users
                         role_id = @RoleId
                     WHERE id = @IdUser";
 
+                var userData = SelectUser(idUser);
                 DbService.ExecuteNonQuery(insertQuery, new()
                 {
                     { "@IdUser", idUser },
-                    { "@Email", user.Email },
-                    { "@FirstName", user.FirstName },
-                    { "@SecondName", user.SecondName },
-                    { "@LastName", user.Lastname },
-                    { "@SecondLastname", user.SecondLastname },
-                    { "@PhoneNumber", user.PhoneNumber },
-                    { "@Address", user.Address },
-                    { "@RoleId", user.RoleId }
+                    { "@Email", user.Email??userData?.Email },
+                    { "@FirstName", user.FirstName??userData?.FirstName },
+                    { "@SecondName", user.SecondName??userData?.SecondName },
+                    { "@LastName", user.Lastname??userData?.Lastname },
+                    { "@SecondLastname", user.SecondLastname??userData?.SecondLastname },
+                    { "@PhoneNumber", user.PhoneNumber??userData?.PhoneNumber },
+                    { "@Address", user.Address??userData?.Address },
+                    { "@RoleId", user.RoleId!=0?user.RoleId:userData.RoleId }
                 });
             }
             finally
