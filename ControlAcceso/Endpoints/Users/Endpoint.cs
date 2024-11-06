@@ -94,6 +94,9 @@ namespace ControlAcceso.Endpoints.Users
         public IActionResult GetUser(int idUser)
         {
             var user = Users?.SelectUser(idUser);
+            if (user is null)
+                return NotFound(new UserResponse{Message = "User not found"});
+            
             return Ok(new UserResponse { Message = "OK", User = user });
         }
 

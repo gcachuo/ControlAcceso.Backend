@@ -19,19 +19,19 @@ namespace ControlAcceso.Data.Users
             try
             {
                 DbService.ExecuteNonQuery("""
-                                    INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address, role_id)
-                                    VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address, @role_id)
-                                 """,
+                                             INSERT INTO Users(username, email, firstname, second_name, lastname, second_lastname, password, phone_number, address, role_id)
+                                             VALUES (@username, @email, @firstname, @second_name, @lastname, @second_lastname, @password, @phone_number, @address, @role_id)
+                                          """,
                     new()
                     {
                         { "@username", user.Username! },
                         { "@email", user.Email! },
                         { "@firstname", user.FirstName! },
-                        { "@second_name", user.SecondName??"" },
+                        { "@second_name", user.SecondName ?? "" },
                         { "@lastname", user.Lastname! },
-                        { "@second_lastname", user.SecondLastname??"" },
+                        { "@second_lastname", user.SecondLastname ?? "" },
                         { "@password", user.Password! },
-                        { "@phone_number", user.PhoneNumber??"" },
+                        { "@phone_number", user.PhoneNumber ?? "" },
                         { "@address", user.Address! },
                         { "@role_id", user.RoleId! },
                     }
@@ -66,29 +66,34 @@ namespace ControlAcceso.Data.Users
                 DbService.ExecuteNonQuery(insertQuery, new()
                 {
                     { "@IdUser", idUser },
-                    { "@Email", user.Email??userData?.Email },
-                    { "@FirstName", user.FirstName??userData?.FirstName },
-                    { "@SecondName", user.SecondName??userData?.SecondName },
-                    { "@LastName", user.Lastname??userData?.Lastname },
-                    { "@SecondLastname", user.SecondLastname??userData?.SecondLastname },
-                    { "@PhoneNumber", user.PhoneNumber??userData?.PhoneNumber },
-                    { "@Address", user.Address??userData?.Address },
-                    { "@RoleId", user.RoleId!=0?user.RoleId:userData.RoleId }
+                    { "@Email", user.Email ?? userData?.Email },
+                    { "@FirstName", user.FirstName ?? userData?.FirstName },
+                    { "@SecondName", user.SecondName ?? userData?.SecondName },
+                    { "@LastName", user.Lastname ?? userData?.Lastname },
+                    { "@SecondLastname", user.SecondLastname ?? userData?.SecondLastname },
+                    { "@PhoneNumber", user.PhoneNumber ?? userData?.PhoneNumber },
+                    { "@Address", user.Address ?? userData?.Address },
+                    { "@RoleId", user.RoleId != 0 ? user.RoleId : userData.RoleId }
                 });
             }
             finally
             {
-                
             }
         }
 
         public UserModel? SelectUser(int id)
         {
-            var row = DbService.ExecuteReader("SELECT * FROM Users where id=@id", new() { { "@id", id } }).SingleOrDefault();
+            var row = DbService.ExecuteReader("""
+                                              SELECT u.*,r.name role FROM Users u 
+                                                  left join roles r on r.id=u.role_id 
+                                                                     where u.id=@id
+                                              """,
+                new() { { "@id", id } }).SingleOrDefault();
             if (row == null)
                 return null;
             return new()
             {
+                Id = int.Parse(row["id"].ToString()!),
                 Address = row["address"].ToString(),
                 PhoneNumber = row["phone_number"].ToString(),
                 Username = row["username"].ToString(),
@@ -98,13 +103,17 @@ namespace ControlAcceso.Data.Users
                 Lastname = row["lastname"].ToString(),
                 SecondLastname = row["second_lastname"].ToString(),
                 RoleId = int.Parse(row["role_id"].ToString()!),
+                Role = row["role"].ToString(),
             };
         }
 
-        
+
         public UserModel? SelectUser(string username)
         {
-            var row = DbService.ExecuteReader("SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where (username=@username or email=@username or phone_number=@username) AND enabled = TRUE", new() { { "@username", username } }).SingleOrDefault();
+            var row = DbService
+                .ExecuteReader(
+                    "SELECT u.*,r.name role FROM Users u left join roles r on r.id=u.role_id where (username=@username or email=@username or phone_number=@username) AND enabled = TRUE",
+                    new() { { "@username", username } }).SingleOrDefault();
             if (row == null)
                 return null;
             return new()
@@ -121,11 +130,13 @@ namespace ControlAcceso.Data.Users
                 SecondLastname = row["second_lastname"]?.ToString(),
             };
         }
+
         public string? SelectPassword(string? username)
         {
-           var row=DbService.ExecuteReader("SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = TRUE", 
-               new() { { "@username", username } }).SingleOrDefault();
-           return row?["password"].ToString();
+            var row = DbService.ExecuteReader(
+                "SELECT password FROM Users where (username=@username or email=@username or phone_number=@username) AND enabled = TRUE",
+                new() { { "@username", username } }).SingleOrDefault();
+            return row?["password"].ToString();
         }
 
         public List<UserModel> SelectUserList()
@@ -133,7 +144,7 @@ namespace ControlAcceso.Data.Users
             var rows = DbService.ExecuteReader("SELECT * FROM Users WHERE enabled = TRUE", new Dictionary<string, dynamic>());
             if (rows == null)
             {
-                throw new DataException("No se encontraron usuarios activos."); 
+                throw new DataException("No se encontraron usuarios activos.");
             }
 
             var users = new List<UserModel>();
@@ -159,6 +170,5 @@ namespace ControlAcceso.Data.Users
             var updateQuery = "UPDATE Users SET enabled = FALSE WHERE id = @IdUser";
             DbService.ExecuteNonQuery(updateQuery, new() { { "@IdUser", idUser } });
         }
-
     }
 }
