@@ -1,12 +1,16 @@
-﻿using ControlAcceso.Data.Model;
+﻿using System.Text.Json.Serialization;
+using ControlAcceso.Data.Model;
 
 namespace ControlAcceso.Endpoints.Users
 {
     public class UserResponse:IResponse
     {
         public string? Message { get; set; }
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public UserModel? User { get; set; }
-
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<UserModel>? Users { get; set; }
 
     }

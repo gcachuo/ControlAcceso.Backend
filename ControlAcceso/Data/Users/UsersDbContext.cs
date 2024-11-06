@@ -24,16 +24,16 @@ namespace ControlAcceso.Data.Users
                                  """,
                     new()
                     {
-                        { "@username", user.Username },
-                        { "@email", user.Email },
-                        { "@firstname", user.FirstName },
-                        { "@second_name", user.SecondName },
-                        { "@lastname", user.Lastname },
-                        { "@second_lastname", user.SecondLastname },
-                        { "@password", user.Password },
-                        { "@phone_number", user.PhoneNumber },
-                        { "@address", user.Address },
-                        { "@role_id", user.RoleId },
+                        { "@username", user.Username! },
+                        { "@email", user.Email! },
+                        { "@firstname", user.FirstName! },
+                        { "@second_name", user.SecondName??"" },
+                        { "@lastname", user.Lastname! },
+                        { "@second_lastname", user.SecondLastname??"" },
+                        { "@password", user.Password! },
+                        { "@phone_number", user.PhoneNumber??"" },
+                        { "@address", user.Address! },
+                        { "@role_id", user.RoleId! },
                     }
                 );
             }
@@ -88,15 +88,15 @@ namespace ControlAcceso.Data.Users
                 return null;
             return new()
             {
-                Address = row["address"]?.ToString(),
-                PhoneNumber = row["phone_number"]?.ToString(),
-                Username = row["username"]?.ToString(),
-                Email = row["email"]?.ToString(),
-                FirstName = row["firstname"]?.ToString(),
-                SecondName = row["second_name"]?.ToString(),
-                Lastname = row["lastname"]?.ToString(),
-                SecondLastname = row["second_lastname"]?.ToString(),
-                RoleId = row["role_id"]?.ToString(),
+                Address = row["address"].ToString(),
+                PhoneNumber = row["phone_number"].ToString(),
+                Username = row["username"].ToString(),
+                Email = row["email"].ToString(),
+                FirstName = row["firstname"].ToString(),
+                SecondName = row["second_name"].ToString(),
+                Lastname = row["lastname"].ToString(),
+                SecondLastname = row["second_lastname"].ToString(),
+                RoleId = int.Parse(row["role_id"].ToString()!),
             };
         }
 
