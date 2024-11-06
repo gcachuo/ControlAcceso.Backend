@@ -14,23 +14,23 @@ namespace ControlAcceso.Endpoints.Users
 {
     [ApiController]
     [Route("users")]
-    public class Endpoint : ControllerBase
+    public partial class Endpoint : ControllerBase
     {
-        private IUsersDbContext? _users { get; }
-        private IRefreshTokensDbContext? _refreshTokens { get; }
+        private IUsersDbContext? Users { get; }
+        private IRefreshTokensDbContext? RefreshTokens { get; }
         private IHttpContext? _httpContext { get; }
 
         public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext)
         {
-            _users = users;
-            _refreshTokens = refreshTokens;
+            Users = users;
+            RefreshTokens = refreshTokens;
             _httpContext = httpContext;
         }
 
         [HttpGet]
         public IActionResult GetUserList()
         {
-            var users = _users?.SelectUserList();
+            var users = Users?.SelectUserList();
             return Ok(new UserResponse { Message = "OK", Users = users });
         }
 
@@ -41,7 +41,7 @@ namespace ControlAcceso.Endpoints.Users
             var username = $"{request.FirstName?.ToLower().Replace(" ", "")}.{request.FirstSurname?.ToLower().Replace(" ", "")}";
             try
             {
-                _users?.InsertUser(new()
+                Users?.InsertUser(new()
                 {
                     Username = username,
                     Email = request.Email,
@@ -62,8 +62,7 @@ namespace ControlAcceso.Endpoints.Users
             }
         }
 
-
-        [HttpPatch("{idUser}")]
+        [HttpPatch("{idUser:int}")]
         public IActionResult EditUser(int idUser, [FromBody] UserRequest request)
         {
             try
@@ -81,7 +80,7 @@ namespace ControlAcceso.Endpoints.Users
                 };
 
 
-                _users?.UpdateUser(user, idUser);
+                Users?.UpdateUser(user, idUser);
 
                 return Ok(new UserResponse { Message = "Usuario actualizado correctamente" });
             }
@@ -91,21 +90,21 @@ namespace ControlAcceso.Endpoints.Users
             }
         }
 
-        [HttpGet("{idUser}")]
+        [HttpGet("{idUser:int}")]
         public IActionResult GetUser(int idUser)
         {
-            var user = _users?.SelectUser(idUser);
+            var user = Users?.SelectUser(idUser);
             return Ok(new UserResponse { Message = "OK", User = user });
         }
 
         [HttpPost("login")]
         public IActionResult LoginUser([FromBody] LoginRequest request)
         {
-            var passwordHash = _users.SelectPassword(request.Username);
+            var passwordHash = Users.SelectPassword(request.Username);
             if (passwordHash is null || !PasswordHasher.VerifyPassword(request.Password, passwordHash))
                 return Unauthorized(new LoginResponse { Message = "Unauthorized" });
 
-            var user = _users.SelectUser(request.Username);
+            var user = Users.SelectUser(request.Username);
 
             var claims = new List<Claim>
             {
@@ -120,11 +119,28 @@ namespace ControlAcceso.Endpoints.Users
             var refreshToken = GenerateRefreshToken();
 
             var ipAddress = _httpContext.GetIpAddress();
-            _refreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent);
+            RefreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent);
 
             return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken, Message = "OK" });
         }
 
+        [HttpDelete("{idUser:int}")]
+        public IActionResult DeleteUser(int idUser)
+        {
+            try
+            {
+                Users?.DisableUser(idUser);
+                return Ok(new UserDelete { Message = "Usuario desactivado correctamente" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new UserDelete { Message = e.Message });
+            }
+        }
+    }
+
+    public partial class Endpoint
+    {
         public string GenerateAccessToken(IEnumerable<Claim> claims, string signingKey, string issuer, string audience)
         {
             var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(signingKey));
@@ -148,20 +164,6 @@ namespace ControlAcceso.Endpoints.Users
             {
                 rng.GetBytes(randomNumber);
                 return Convert.ToBase64String(randomNumber);
-            }
-        }
-
-        [HttpDelete("{idUser}")]
-        public IActionResult DeleteUser(int idUser)
-        {
-            try
-            {
-                _users?.DisableUser(idUser);
-                return Ok(new UserDelete { Message = "Usuario desactivado correctamente" });
-            }
-            catch (DataException e)
-            {
-                return BadRequest(new UserDelete { Message = e.Message });
             }
         }
     }
