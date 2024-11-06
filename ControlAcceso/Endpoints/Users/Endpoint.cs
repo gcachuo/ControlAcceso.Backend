@@ -104,7 +104,7 @@ namespace ControlAcceso.Endpoints.Users
         {
            var passwordHash = _users.SelectPassword(request.Username);
            if (passwordHash is null || !PasswordHasher.VerifyPassword(request.Password, passwordHash))
-               return Unauthorized(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "Unauthorized" });
+               return Unauthorized(new LoginResponse { Message = "Unauthorized" });
            
            var user = _users.SelectUser(request.Username);
 

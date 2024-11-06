@@ -18,7 +18,11 @@ namespace ControlAcceso.Endpoints.Users
     public class LoginResponse : IResponse
     {
         public string? Message { get; set; }
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? AccessToken { get; set; }
+        
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? RefreshToken { get; set; }
     }
 
