@@ -14,25 +14,24 @@ namespace ControlAcceso.Endpoints.Users
 {
     [ApiController]
     [Route("users")]
-    public class Endpoint : ControllerBase
+    public partial class Endpoint : ControllerBase
     {
-        private IUsersDbContext? _users { get; }
-        private IRefreshTokensDbContext? _refreshTokens { get; }
+        private IUsersDbContext? Users { get; }
+        private IRefreshTokensDbContext? RefreshTokens { get; }
         private IHttpContext? _httpContext { get; }
-        
+
         public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext)
         {
-            _users = users;
-            _refreshTokens = refreshTokens;
+            Users = users;
+            RefreshTokens = refreshTokens;
             _httpContext = httpContext;
         }
 
         [HttpGet]
         public IActionResult GetUserList()
         {
-            var users = _users?.SelectUserList();
-            return Ok(new UserResponse {Message = "OK", Users=users});
-            
+            var users = Users?.SelectUserList();
+            return Ok(new UserResponse { Message = "OK", Users = users });
         }
 
         [HttpPost("register")]
@@ -42,7 +41,7 @@ namespace ControlAcceso.Endpoints.Users
             var username = $"{request.FirstName?.ToLower().Replace(" ", "")}.{request.FirstSurname?.ToLower().Replace(" ", "")}";
             try
             {
-                _users?.InsertUser(new()
+                Users?.InsertUser(new()
                 {
                     Username = username,
                     Email = request.Email,
@@ -63,8 +62,7 @@ namespace ControlAcceso.Endpoints.Users
             }
         }
 
-
-        [HttpPatch("{idUser}")]
+        [HttpPatch("{idUser:int}")]
         public IActionResult EditUser(int idUser, [FromBody] UserRequest request)
         {
             try
@@ -82,50 +80,70 @@ namespace ControlAcceso.Endpoints.Users
                 };
 
 
-                _users?.UpdateUser(user, idUser);
+                Users?.UpdateUser(user, idUser);
 
                 return Ok(new UserResponse { Message = "Usuario actualizado correctamente" });
-                }
+            }
             catch (DataException e)
             {
                 return BadRequest(new UserResponse { Message = e.Message });
             }
         }
 
-        [HttpGet("{idUser}")]
+        [HttpGet("{idUser:int}")]
         public IActionResult GetUser(int idUser)
         {
-            var user=_users?.SelectUser(idUser);
-            return Ok(new UserResponse { Message = "OK", User=user });
+            var user = Users?.SelectUser(idUser);
+            if (user is null)
+                return NotFound(new UserResponse{Message = "User not found"});
+            
+            return Ok(new UserResponse { Message = "OK", User = user });
         }
 
         [HttpPost("login")]
         public IActionResult LoginUser([FromBody] LoginRequest request)
         {
-           var passwordHash = _users.SelectPassword(request.Username);
-           if (passwordHash is null || !PasswordHasher.VerifyPassword(request.Password, passwordHash))
-               return Unauthorized(new LoginResponse { AccessToken = "", RefreshToken = "", Message = "Unauthorized" });
-           
-           var user = _users.SelectUser(request.Username);
+            var passwordHash = Users.SelectPassword(request.Username);
+            if (passwordHash is null || !PasswordHasher.VerifyPassword(request.Password, passwordHash))
+                return Unauthorized(new LoginResponse { Message = "Unauthorized" });
 
-           var claims = new List<Claim>
-           {
-               new("UserId", user.Id.ToString()),
-               new("Role", user.Role)
-           };
-           var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
-           var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-           var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+            var user = Users.SelectUser(request.Username);
 
-           var accessToken = GenerateAccessToken(claims,signingKey,issuer,audience);
-           var refreshToken = GenerateRefreshToken();
-           
-           var ipAddress = _httpContext.GetIpAddress();
-           _refreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent??"");
-           
-           return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken, Message = "OK" });
+            var claims = new List<Claim>
+            {
+                new("UserId", user.Id.ToString()),
+                new("Role", user.Role)
+            };
+            var signingKey = Environment.GetEnvironmentVariable("JWT_SIGNING_KEY");
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+
+            var accessToken = GenerateAccessToken(claims, signingKey, issuer, audience);
+            var refreshToken = GenerateRefreshToken();
+
+            var ipAddress = _httpContext.GetIpAddress();
+            RefreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent);
+
+            return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken, Message = "OK" });
         }
 
+        [HttpDelete("{idUser:int}")]
+        public IActionResult DeleteUser(int idUser)
+        {
+            try
+            {
+                Users?.DisableUser(idUser);
+                return Ok(new UserDelete { Message = "Usuario desactivado correctamente" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new UserDelete { Message = e.Message });
+            }
+        }
+    }
+
+    public partial class Endpoint
+    {
         public string GenerateAccessToken(IEnumerable<Claim> claims, string signingKey, string issuer, string audience)
         {
             var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(signingKey));
@@ -135,12 +153,13 @@ namespace ControlAcceso.Endpoints.Users
                 issuer,
                 audience,
                 claims,
-                expires: DateTime.Now.AddHours(1),  // Duración del Access Token (1 hora)
+                expires: DateTime.Now.AddHours(1), // Duración del Access Token (1 hora)
                 signingCredentials: signingCredentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
+
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -150,20 +169,5 @@ namespace ControlAcceso.Endpoints.Users
                 return Convert.ToBase64String(randomNumber);
             }
         }
-
-        [HttpDelete("{idUser}")]
-        public IActionResult DeleteUser(int idUser)
-        {
-            try
-            {
-                _users?.DisableUser(idUser);
-                return Ok(new UserDelete { Message = "Usuario desactivado correctamente" });
-            }
-            catch (DataException e)
-            {
-                return BadRequest(new UserDelete { Message = e.Message });
-            }
-        }
-
     }
 }

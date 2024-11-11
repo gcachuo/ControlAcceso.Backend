@@ -1,4 +1,5 @@
-﻿using ControlAcceso.Data.Model;
+﻿using System.Data.Common;
+using ControlAcceso.Data.Model;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Services.DBService;
 using Moq;
@@ -7,7 +8,7 @@ namespace ControlAcceso.Tests.Data
 {
     public class UsersDbContextTests
     {
-        private Mock<IDbService> _dbServiceMock = new(MockBehavior.Default);
+        private readonly Mock<IDbService> _dbServiceMock = new(MockBehavior.Default);
 
         [Fact]
         public void Should_Insert_User()
@@ -27,9 +28,26 @@ namespace ControlAcceso.Tests.Data
         {
             //Arrange
             var idUser = 1;
-            var user = new UserModel();
+            var user = new UserModel(){RoleId = 0};
 
             //Mock
+            _dbServiceMock.Setup(x=>x.ExecuteReader(It.IsAny<string>(),It.IsAny<Dictionary<string,dynamic>>()))
+                .Returns([
+                    new()
+                    {
+                        { "id", idUser },
+                        { "address", "" },
+                        { "phone_number", "" },
+                        { "username", "" },
+                        { "email", "" },
+                        { "firstname", "" },
+                        { "second_name", "" },
+                        { "lastname", "" },
+                        { "second_lastname", "" },
+                        { "role_id", "0" },
+                        { "role", "" },
+                    }
+                ]);
 
             //Act
             var context = new UsersDbContext(_dbServiceMock.Object);
