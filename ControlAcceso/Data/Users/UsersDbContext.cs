@@ -43,6 +43,7 @@ namespace ControlAcceso.Data.Users
                 {
                     throw new DataException("Usuario duplicado.");
                 }
+                throw;
             }
         }
 
@@ -96,7 +97,7 @@ namespace ControlAcceso.Data.Users
                 SecondName = row["second_name"]?.ToString(),
                 Lastname = row["lastname"]?.ToString(),
                 SecondLastname = row["second_lastname"]?.ToString(),
-                RoleId = row["role_id"]?.ToString(),
+                RoleId = int.Parse(row["role_id"]?.ToString()),
             };
         }
 

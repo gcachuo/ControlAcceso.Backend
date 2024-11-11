@@ -121,7 +121,7 @@ namespace ControlAcceso.Endpoints.Users
            var refreshToken = GenerateRefreshToken();
            
            var ipAddress = _httpContext.GetIpAddress();
-           _refreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent);
+           _refreshTokens.InsertToken(refreshToken, (int)user.Id!, ipAddress, request.UserAgent??"");
            
            return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken, Message = "OK" });
         }
