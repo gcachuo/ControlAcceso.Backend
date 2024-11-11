@@ -1,11 +1,15 @@
+using System.Collections;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using ControlAcceso.Data.Addresses;
 using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
+using ControlAcceso.Endpoints;
 using ControlAcceso.Services.DBService;
 using ControlAcceso.Tools.HttpContext;
+using Microsoft.AspNetCore.Diagnostics;
 using Npgsql;
 
 namespace ControlAcceso
@@ -41,9 +45,9 @@ namespace ControlAcceso
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",
-                    builder =>
+                    appBuilder =>
                     {
-                        builder.AllowAnyOrigin()
+                        appBuilder.AllowAnyOrigin()
                             .AllowAnyMethod()
                             .AllowAnyHeader();
                     });
@@ -64,10 +68,49 @@ namespace ControlAcceso
             app.MapControllers();
             
             app.UseCors("AllowAllOrigins");
+
+            app.UseExceptionHandler(appBuilder =>
+            {
+                appBuilder.Run(async context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+
+                    // Obtener la excepción
+                    var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+
+                    var error = new ErrorResponse
+                    {
+                        Message = "Ha ocurrido un error en el servidor.",
+                        Error = new()
+                        {
+                            Type = exceptionHandlerFeature?.Error.GetType().Name,
+                            Message = exceptionHandlerFeature?.Error.Message,
+                            Data = exceptionHandlerFeature?.Error.Data,
+                        }
+                    };
+
+                    var jsonResponse = JsonSerializer.Serialize(error);
+                    await context.Response.WriteAsync(jsonResponse);
+                });
+            });
             
             DotNetEnv.Env.Load();
 
             app.Run();
+        }
+    }
+
+    internal class ErrorResponse : IResponse
+    {
+        public string? Message { get; set; }
+        public ErrorEntity? Error { get; set; }
+
+        internal class ErrorEntity
+        {
+            public string? Type { get; set; }
+            public string? Message { get; set; }
+            public IDictionary? Data { get; set; }
         }
     }
 }
