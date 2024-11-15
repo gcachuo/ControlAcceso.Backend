@@ -1,4 +1,6 @@
-﻿namespace ControlAcceso.Data.Model
+﻿using System.Text.Json.Serialization;
+
+namespace ControlAcceso.Data.Model
 {
     public class UserModel
     {
@@ -16,13 +18,14 @@
 
         public string? SecondLastname { get; set; }
         
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Password { get; set; }
 
         public string? PhoneNumber { get; set; }
 
         public string? Address { get; set; }
         
-        public string? RoleId { get; set; }
+        public int? RoleId { get; set; }
         
         public string? Role { get; set; }
     }
