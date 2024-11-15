@@ -43,6 +43,7 @@ namespace ControlAcceso.Data.Users
                 {
                     throw new DataException("Usuario duplicado.");
                 }
+                throw;
             }
         }
 

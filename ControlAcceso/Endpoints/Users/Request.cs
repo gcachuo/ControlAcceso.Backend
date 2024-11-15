@@ -20,7 +20,7 @@ namespace ControlAcceso.Endpoints.Users
 
         public string? Address { get; set; }
 
-        public int RoleId { get; set; }
+        public int? RoleId { get; set; }
 
     }
 
