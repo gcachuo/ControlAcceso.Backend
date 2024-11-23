@@ -36,5 +36,37 @@ namespace ControlAcceso.Endpoints.Roles
                 return BadRequest(new Response { Message = e.Message });
             }
         }
+
+        [HttpPatch("{id}")]
+        public IActionResult EditRole(int id, [FromBody] RoleModel role)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(role.Name))
+                {
+                    return BadRequest(new { Message = "El campo 'name' es obligatorio." });
+                }
+
+                var existingRole = _roles?.SelectRoleById(id);
+                if (existingRole == null)
+                {
+                    return NotFound(new { Message = $"El rol con ID {id} no existe." });
+                }
+
+                // Actualizar el nombre del rol
+                _roles?.UpdateRoleName(id, role);
+
+                return Ok(new { Message = "Rol actualizado exitosamente." });
+            }
+            catch (DataException ex)
+            {
+                return Conflict(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Ocurrió un error inesperado.", Error = ex.Message });
+            }
+        }
+
     }
 }

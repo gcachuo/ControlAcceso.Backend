@@ -55,4 +55,72 @@ public class RolesDbContext:IRolesDbContext
 
         return roles;
     }
+
+    public RoleModel? SelectRoleById(int id)
+    {
+        try
+        {
+            // Consulta SQL para obtener el rol por ID
+            var query = "SELECT * FROM Roles WHERE id = @Id";
+
+            // Ejecutar la consulta y obtener el resultado
+            var rows = DbService.ExecuteReader(query, new()
+            {
+                { "@Id", id }
+            });
+
+            // Si no se encontraron resultados, devolver null
+            if (!rows.Any())
+            {
+                return null;
+            }
+
+            // Tomar la primera fila y convertirla a RoleModel
+            var row = rows.First();
+            return new RoleModel
+            {
+                Id = row["id"]?.ToString(),
+                Name = row["name"]?.ToString()
+            };
+        }
+        catch (Exception ex)
+        {
+            throw new DataException("Error al obtener el rol por ID.", ex);
+        }
+    }
+
+    public void UpdateRoleName(int IdRole, RoleModel role)
+    {
+        try
+        {
+            // Verificar si el rol existe
+            var existingRole = SelectRoleById(IdRole);
+            if (existingRole == null)
+            {
+                throw new DataException($"El rol con ID {IdRole} no existe.");
+            }
+
+            // Consulta SQL para actualizar el nombre del rol
+            var updateQuery = @"
+                UPDATE Roles
+                SET name = @Name
+                WHERE id = @Id";
+
+            DbService.ExecuteNonQuery(updateQuery, new()
+            {
+                { "@Id", IdRole },
+                { "@Name", role.Name }
+            });
+        }
+        catch (PostgresException e)
+        {
+            if (e.Data["SqlState"]?.ToString() == "23505") // Código de error para entradas duplicadas
+            {
+                throw new DataException("Ya existe un rol con ese nombre.");
+            }
+            throw;
+        }
+    }
+
+
 }
