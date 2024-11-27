@@ -49,58 +49,23 @@ public class RolesDbContext:IRolesDbContext
             roles.Add(new RoleModel
             {
                 Name = row["name"]?.ToString(),
-                Id = row["id"]?.ToString()
+                Id = row["id"] as int?
             });
         }
 
         return roles;
     }
 
-    public RoleModel? SelectRoleById(int id)
+    public void UpdateRoleName(RoleModel role)
     {
         try
         {
-            // Consulta SQL para obtener el rol por ID
-            var query = "SELECT * FROM Roles WHERE id = @Id";
-
-            // Ejecutar la consulta y obtener el resultado
-            var rows = DbService.ExecuteReader(query, new()
-            {
-                { "@Id", id }
-            });
-
-            // Si no se encontraron resultados, devolver null
-            if (!rows.Any())
-            {
-                return null;
-            }
-
-            // Tomar la primera fila y convertirla a RoleModel
-            var row = rows.First();
-            return new RoleModel
-            {
-                Id = row["id"]?.ToString(),
-                Name = row["name"]?.ToString()
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new DataException("Error al obtener el rol por ID.", ex);
-        }
-    }
-
-    public void UpdateRoleName(int IdRole, RoleModel role)
-    {
-        try
-        {
-            // Verificar si el rol existe
-            var existingRole = SelectRoleById(IdRole);
+            var existingRole = SelectRole();
             if (existingRole == null)
             {
-                throw new DataException($"El rol con ID {IdRole} no existe.");
+                throw new DataException("El rol no existe.");
             }
 
-            // Consulta SQL para actualizar el nombre del rol
             var updateQuery = @"
                 UPDATE Roles
                 SET name = @Name
@@ -108,13 +73,13 @@ public class RolesDbContext:IRolesDbContext
 
             DbService.ExecuteNonQuery(updateQuery, new()
             {
-                { "@Id", IdRole },
-                { "@Name", role.Name }
+                { "@Name", role.Name },
+                { "@Id", role.Id }
             });
         }
         catch (PostgresException e)
         {
-            if (e.Data["SqlState"]?.ToString() == "23505") // Código de error para entradas duplicadas
+            if (e.Data["SqlState"]?.ToString() == "23505")
             {
                 throw new DataException("Ya existe un rol con ese nombre.");
             }

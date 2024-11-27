@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using ControlAcceso.Data.Roles;
 using Microsoft.AspNetCore.Mvc;
+using ControlAcceso.Data.Model;
 
 namespace ControlAcceso.Endpoints.Roles
 {
@@ -19,7 +20,7 @@ namespace ControlAcceso.Endpoints.Roles
         public IActionResult GetRoleList()
         {
             var roles = _roles?.SelectRole();
-            return Ok(new Response {Message = "OK", Roles=roles});
+            return Ok(new RoleResponse {Message = "OK", Roles=roles});
             
         }
 
@@ -37,8 +38,8 @@ namespace ControlAcceso.Endpoints.Roles
             }
         }
 
-        [HttpPatch("{id}")]
-        public IActionResult EditRole(int id, [FromBody] RoleModel role)
+        [HttpPatch("{id:int}")]
+        public IActionResult EditRole([FromBody] Request role)
         {
             try
             {
@@ -47,24 +48,24 @@ namespace ControlAcceso.Endpoints.Roles
                     return BadRequest(new { Message = "El campo 'name' es obligatorio." });
                 }
 
-                var existingRole = _roles?.SelectRoleById(id);
+                var existingRole = _roles?.SelectRole();
                 if (existingRole == null)
                 {
-                    return NotFound(new { Message = $"El rol con ID {id} no existe." });
+                    return NotFound(new { Message = "El rol no existe error endpoint." });
                 }
 
-                // Actualizar el nombre del rol
-                _roles?.UpdateRoleName(id, role);
+                var roleModel = new RoleModel
+                {
+                    Name = role.Name
+                };
 
-                return Ok(new { Message = "Rol actualizado exitosamente." });
+                _roles?.UpdateRoleName(roleModel);
+
+                return Ok(new Response { Message = "Rol actualizado exitosamente." });
             }
-            catch (DataException ex)
+            catch (DataException e)
             {
-                return Conflict(new { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "Ocurrió un error inesperado.", Error = ex.Message });
+                return BadRequest(new Response { Message = e.Message });
             }
         }
 
