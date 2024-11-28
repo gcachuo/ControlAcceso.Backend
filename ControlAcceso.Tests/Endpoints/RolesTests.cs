@@ -96,23 +96,23 @@ namespace ControlAcceso.Tests.Endpoints
         }
 
         [Fact]
-        public void Should_Return_NotFound_If_Role_Does_Not_Exist()
+        public void Should_Return_BadRequest_If_Role_Is_Null()
         {
             // Arrange
-            var request = new Request { Name = "NewName" };
+            var request = new Request { Name = "" }; 
             var mockRoles = new List<RoleModel>(); 
 
-            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+            // Setup the mock
+            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles); 
 
             // Act
             var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
             var result = endpoint.EditRole(1, request) as ObjectResult;
 
             // Assert
-            result?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+            result?.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            (result!.Value as Response)!.Message.Should().Be("El campo 'name' es obligatorio"); 
         }
-
-
 
     }
 }

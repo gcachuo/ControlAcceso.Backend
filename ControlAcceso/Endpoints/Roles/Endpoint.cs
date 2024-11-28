@@ -45,7 +45,7 @@ namespace ControlAcceso.Endpoints.Roles
             {
                 if (string.IsNullOrWhiteSpace(role.Name))
                 {
-                    return BadRequest(new { Message = "El campo 'name' es obligatorio" });
+                    return BadRequest(new Response{ Message = "El campo 'name' es obligatorio" });
                 }
                 
                 _roles?.UpdateRoleName(id, new RoleModel { Id = id, Name = role.Name });

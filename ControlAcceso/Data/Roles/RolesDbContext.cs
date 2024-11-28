@@ -68,16 +68,23 @@ public class RolesDbContext:IRolesDbContext
 
             var result = DbService.ExecuteReader(selectRole, parameters);
 
-            var updateQuery = @"
+            if (result != null)
+            {
+                var updateQuery = @"
                 UPDATE Roles
                 SET name = @Name
                 WHERE id = @Id";
 
-            DbService.ExecuteNonQuery(updateQuery, new()
+                DbService.ExecuteNonQuery(updateQuery, new()
             {
                 { "@Name", role.Name },
                 { "@Id", id }
             });
+            }
+            else
+            {
+                throw new DataException("El rol no existe.");
+            }
         }
         catch (PostgresException e)
         {
