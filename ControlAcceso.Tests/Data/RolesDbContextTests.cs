@@ -157,5 +157,38 @@ namespace ControlAcceso.Tests.Data
                 Times.Once);
         }
 
+                [Fact]
+        public void UpdateRoleName_ThrowsDataException()
+        {
+            // Arrange
+            var duplicateRole = new RoleModel { Id = 1, Name = "DuplicateName" };
+
+            // Simula que hay roles existentes para que no sea null
+            _dbServiceMock.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
+                        .Returns(new List<Dictionary<string, dynamic>>
+                        {
+                            new() { { "id", 1 }, { "name", "Admin" } }
+                        });
+
+            var postgresException = new PostgresException("Duplicate key error", null, null, null)
+            {
+                Data = { ["SqlState"] = "23505" }
+            };
+
+            _dbServiceMock.Setup(x => x.ExecuteNonQuery(It.IsAny<string>(), It.IsAny<Dictionary<string, object>>()))
+                        .Throws(postgresException);
+
+            var dbContext = new RolesDbContext(_dbServiceMock.Object);
+
+            // Act
+            Action act = () => dbContext.UpdateRoleName(1, duplicateRole);
+
+            // Assert
+            act.Should().Throw<DataException>()
+            .WithMessage("Ya existe un rol con ese nombre.");
+        }
+
+
+
     }
 }
