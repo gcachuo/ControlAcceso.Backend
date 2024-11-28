@@ -60,11 +60,13 @@ public class RolesDbContext:IRolesDbContext
     {
         try
         {
-            var existingRole = SelectRole().FirstOrDefault(r => r.Id == role.Id);
-            if (existingRole == null)
+            var selectRole = "SELECT id FROM Roles WHERE id = @Id";
+            var parameters = new Dictionary<string, dynamic>
             {
-                throw new DataException("El rol no existe.");
-            }
+                { "@Id", id }
+            };
+
+            var result = DbService.ExecuteReader(selectRole, parameters);
 
             var updateQuery = @"
                 UPDATE Roles

@@ -47,18 +47,8 @@ namespace ControlAcceso.Endpoints.Roles
                 {
                     return BadRequest(new { Message = "El campo 'name' es obligatorio" });
                 }
-
-                var roles = _roles?.SelectRole();
-                var existingRole = roles?.FirstOrDefault(r => r.Id == id);
-
-                if (existingRole == null)
-                {
-                    return NotFound(new { Message = $"El rol con el ID {id} no existe" });
-                }
-
-                existingRole.Name = role.Name;
-                _roles?.UpdateRoleName(id, existingRole);
-
+                
+                _roles?.UpdateRoleName(id, new RoleModel { Id = id, Name = role.Name });
 
                 return Ok(new Response { Message = "Rol actualizado exitosamente." });
             }
