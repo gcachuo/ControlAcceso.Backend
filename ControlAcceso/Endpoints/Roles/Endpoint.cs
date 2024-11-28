@@ -45,18 +45,19 @@ namespace ControlAcceso.Endpoints.Roles
             {
                 if (string.IsNullOrWhiteSpace(role.Name))
                 {
-                    return BadRequest(new { Message = "El campo 'name' es obligatorio." });
+                    return BadRequest(new { Message = "El campo 'name' es obligatorio" });
                 }
 
                 var existingRole = _roles?.SelectRole();
                 if (existingRole == null)
                 {
-                    return NotFound(new { Message = "El rol no existe error endpoint." });
+                    return NotFound(new { Message = "El rol no existe" });
                 }
 
                 var roleModel = new RoleModel
                 {
-                    Name = role.Name
+                    Name = role.Name,
+                    Id = role.Id
                 };
 
                 _roles?.UpdateRoleName(roleModel);

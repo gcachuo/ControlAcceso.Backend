@@ -60,7 +60,7 @@ public class RolesDbContext:IRolesDbContext
     {
         try
         {
-            var existingRole = SelectRole();
+            var existingRole = SelectRole().FirstOrDefault(r => r.Id == role.Id);
             if (existingRole == null)
             {
                 throw new DataException("El rol no existe.");
