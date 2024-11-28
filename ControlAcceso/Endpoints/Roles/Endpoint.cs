@@ -39,7 +39,7 @@ namespace ControlAcceso.Endpoints.Roles
         }
 
         [HttpPatch("{id:int}")]
-        public IActionResult EditRole([FromBody] Request role)
+        public IActionResult EditRole(int id, [FromBody] Request role)
         {
             try
             {
@@ -48,19 +48,17 @@ namespace ControlAcceso.Endpoints.Roles
                     return BadRequest(new { Message = "El campo 'name' es obligatorio" });
                 }
 
-                var existingRole = _roles?.SelectRole();
+                var roles = _roles?.SelectRole();
+                var existingRole = roles?.FirstOrDefault(r => r.Id == id);
+
                 if (existingRole == null)
                 {
-                    return NotFound(new { Message = "El rol no existe" });
+                    return NotFound(new { Message = $"El rol con el ID {id} no existe" });
                 }
 
-                var roleModel = new RoleModel
-                {
-                    Name = role.Name,
-                    Id = role.Id
-                };
+                existingRole.Name = role.Name;
+                _roles?.UpdateRoleName(id, existingRole);
 
-                _roles?.UpdateRoleName(roleModel);
 
                 return Ok(new Response { Message = "Rol actualizado exitosamente." });
             }

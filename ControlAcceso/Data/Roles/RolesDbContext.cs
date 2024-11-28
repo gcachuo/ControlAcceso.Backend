@@ -56,7 +56,7 @@ public class RolesDbContext:IRolesDbContext
         return roles;
     }
 
-    public void UpdateRoleName(RoleModel role)
+    public void UpdateRoleName(int id, RoleModel role)
     {
         try
         {
@@ -74,7 +74,7 @@ public class RolesDbContext:IRolesDbContext
             DbService.ExecuteNonQuery(updateQuery, new()
             {
                 { "@Name", role.Name },
-                { "@Id", role.Id }
+                { "@Id", id }
             });
         }
         catch (PostgresException e)

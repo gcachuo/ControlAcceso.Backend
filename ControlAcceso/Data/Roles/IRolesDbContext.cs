@@ -8,6 +8,6 @@ public interface IRolesDbContext
 
     public List<RoleModel> SelectRole();
     
-    public void UpdateRoleName(RoleModel role);
+    public void UpdateRoleName(int id,RoleModel role);
 
 }
