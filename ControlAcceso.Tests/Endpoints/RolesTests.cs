@@ -73,5 +73,46 @@ namespace ControlAcceso.Tests.Endpoints
             (result!.Value as RoleResponse)!.Roles.Should().BeEmpty(); 
         }
 
+        [Fact]
+        public void Should_Edit_Role_Successfully()
+        {
+            // Arrange
+            var request = new Request { Name = "NuevoNombre" };
+            var mockRoles = new List<RoleModel>
+            {
+                new RoleModel { Id = 1, Name = "Admin" }
+            };
+
+            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+            _rolesDbContext.Setup(x => x.UpdateRoleName(It.IsAny<int>(), It.IsAny<RoleModel>()));
+
+            // Act
+            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var result = endpoint.EditRole(1, request) as ObjectResult;
+
+            // Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status200OK);
+            (result!.Value as Response)!.Message.Should().Be("Rol actualizado exitosamente.");
+        }
+
+        [Fact]
+        public void Should_Return_NotFound_If_Role_Does_Not_Exist()
+        {
+            // Arrange
+            var request = new Request { Name = "NewName" };
+            var mockRoles = new List<RoleModel>(); 
+
+            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+
+            // Act
+            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var result = endpoint.EditRole(1, request) as ObjectResult;
+
+            // Assert
+            result?.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+        }
+
+
+
     }
 }

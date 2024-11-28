@@ -128,5 +128,34 @@ namespace ControlAcceso.Tests.Data
             //Assert
            var result = act.Should().ThrowExactly<DataException>();
         }
+
+        [Fact]
+        public void Should_Update_Role_Successfully()
+        {
+            // Arrange
+            var roleToUpdate = new RoleModel { Id = 1, Name = "Admin" };
+            var updatedRole = new RoleModel { Id = 1, Name = "Administrador" };
+            var mockRoles = new List<RoleModel> { roleToUpdate };
+
+            _dbServiceMock.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, object>>()))
+                        .Returns(new List<Dictionary<string, dynamic>>
+                        {
+                            new Dictionary<string, dynamic> { { "id", 1 }, { "name", "Admin" } }
+                        });
+
+            _dbServiceMock.Setup(x => x.ExecuteNonQuery(It.IsAny<string>(), It.IsAny<Dictionary<string, object>>()));
+
+            // Act
+            var dbContext = new RolesDbContext(_dbServiceMock.Object);
+            dbContext.UpdateRoleName(1, updatedRole);
+
+            // Assert
+            _dbServiceMock.Verify(x => x.ExecuteNonQuery(
+                It.Is<string>(query => query.Contains("UPDATE Roles")),
+                It.Is<Dictionary<string, object>>(parameters =>
+                    (int)parameters["@Id"] == 1 && (string)parameters["@Name"] == "Administrador")),
+                Times.Once);
+        }
+
     }
 }
