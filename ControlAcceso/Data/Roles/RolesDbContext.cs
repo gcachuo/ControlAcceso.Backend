@@ -60,13 +60,13 @@ public class RolesDbContext:IRolesDbContext
     {
         try
         {
-            var selectRole = "SELECT id FROM Roles WHERE id = @Id";
+            var selectRolebyId = "SELECT id FROM Roles WHERE id = @Id";
             var parameters = new Dictionary<string, dynamic>
             {
                 { "@Id", id }
             };
 
-            var result = DbService.ExecuteReader(selectRole, parameters);
+            var result = DbService.ExecuteReader(selectRolebyId, parameters);
 
             if (result != null)
             {
