@@ -49,10 +49,69 @@ public class RolesDbContext:IRolesDbContext
             roles.Add(new RoleModel
             {
                 Name = row["name"]?.ToString(),
-                Id = row["id"]?.ToString()
+                Id = row["id"] as int?
             });
         }
 
         return roles;
     }
+
+    public RoleModel SelectRoleById(int id)
+    {
+        var query = "SELECT * FROM Roles WHERE id = @Id";
+
+        var rows = DbService.ExecuteReader(query, new Dictionary<string, dynamic>
+        {
+            { "@Id", id }
+        });
+
+        if (rows.Count > 0)
+        {
+            var row = rows[0];
+            return new RoleModel
+            {
+                Id = row["id"] as int?,
+                Name = row["name"]?.ToString()
+            };
+        }
+
+        return null;
+    }
+
+    public void UpdateRoleName(int id, RoleModel role)
+    {
+        try
+        {
+            var existingRole = SelectRoleById(id);
+
+            if (existingRole != null)
+            {
+                var updateQuery = @"
+                UPDATE Roles
+                SET name = @Name
+                WHERE id = @Id";
+
+                DbService.ExecuteNonQuery(updateQuery, new Dictionary<string, dynamic>
+                {
+                    { "@Name", role.Name },
+                    { "@Id", id }
+                });
+            }
+            else
+            {
+                throw new DataException("El rol no existe.");
+            }
+        }
+        catch (PostgresException e)
+        {
+            if (e.Data["SqlState"]?.ToString() == "23505")
+            {
+                throw new DataException("Ya existe un rol con ese nombre.");
+            }
+            throw;
+        }
+    }
+
+
+
 }
