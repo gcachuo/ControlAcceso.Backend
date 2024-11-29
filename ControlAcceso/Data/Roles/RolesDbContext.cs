@@ -56,30 +56,46 @@ public class RolesDbContext:IRolesDbContext
         return roles;
     }
 
+    public RoleModel SelectRoleById(int id)
+    {
+        var query = "SELECT * FROM Roles WHERE id = @Id";
+
+        var rows = DbService.ExecuteReader(query, new Dictionary<string, dynamic>
+        {
+            { "@Id", id }
+        });
+
+        if (rows.Count > 0)
+        {
+            var row = rows[0];
+            return new RoleModel
+            {
+                Id = row["id"] as int?,
+                Name = row["name"]?.ToString()
+            };
+        }
+
+        return null;
+    }
+
     public void UpdateRoleName(int id, RoleModel role)
     {
         try
         {
-            var selectRolebyId = "SELECT id FROM Roles WHERE id = @Id";
-            var parameters = new Dictionary<string, dynamic>
-            {
-                { "@Id", id }
-            };
+            var existingRole = SelectRoleById(id);
 
-            var result = DbService.ExecuteReader(selectRolebyId, parameters);
-
-            if (result != null)
+            if (existingRole != null)
             {
                 var updateQuery = @"
                 UPDATE Roles
                 SET name = @Name
                 WHERE id = @Id";
 
-                DbService.ExecuteNonQuery(updateQuery, new()
-            {
-                { "@Name", role.Name },
-                { "@Id", id }
-            });
+                DbService.ExecuteNonQuery(updateQuery, new Dictionary<string, dynamic>
+                {
+                    { "@Name", role.Name },
+                    { "@Id", id }
+                });
             }
             else
             {
@@ -95,6 +111,7 @@ public class RolesDbContext:IRolesDbContext
             throw;
         }
     }
+
 
 
 }
