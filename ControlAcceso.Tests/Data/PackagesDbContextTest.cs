@@ -29,7 +29,7 @@ namespace ControlAcceso.Tests
                     { "id", 1 },
                     { "service", "Delivery" },
                     { "received_at", DateTime.Now },
-                    { "confirmed_at", DBNull.Value },
+                    { "confirmed_at", null },
                     { "address_id", 101 },
                     { "status", 0 }
                 },
@@ -38,7 +38,7 @@ namespace ControlAcceso.Tests
                     { "id", 2 },
                     { "service", "Pickup" },
                     { "received_at", DateTime.Now },
-                    { "confirmed_at", DBNull.Value },
+                    { "confirmed_at", null },
                     { "address_id", 102 },
                     { "status", 0 }
                 }
@@ -74,14 +74,21 @@ namespace ControlAcceso.Tests
         }
 
         [Fact]
-        public void GetReceivedPackages_ThrowsException_WhenDbFails()
+        public void GetReceivedPackages_HandlesException_Gracefully()
         {
             // Arrange
-            _mockDbService.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
-                          .Throws(new Exception("Database connection failed"));
+            var mockDbService = new Mock<IDbService>();
+
+            mockDbService.Setup(db => db.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
+                        .Throws(new PostgresException("Database connection failed", "Severity", "InvariantSeverity", "SqlState"));
+
+            var dbContext = new PackagesDbContext(mockDbService.Object);
 
             // Act & Assert
-            Assert.Throws<Exception>(() => _dbContext.SelectPackages());
+            var exception = Assert.Throws<PostgresException>(() => dbContext.SelectPackages());
+
+            Assert.Equal("SqlState: Database connection failed", exception.Message);
         }
+
     }
 }

@@ -26,7 +26,7 @@ namespace ControlAcceso.Data.Packages
                     Id = Convert.ToInt32(row["id"]),
                     Service = row["service"]?.ToString(),
                     ReceivedAt = Convert.ToDateTime(row["received_at"]),
-                    ConfirmedAt = row["confirmed_at"] != DBNull.Value ? Convert.ToDateTime(row["confirmed_at"]) : null,
+                    ConfirmedAt = row["confirmed_at"] != null ? Convert.ToDateTime(row["confirmed_at"]) : null,
                     AddressId = Convert.ToInt32(row["address_id"]),
                     Status = Convert.ToInt32(row["status"])
                 });
