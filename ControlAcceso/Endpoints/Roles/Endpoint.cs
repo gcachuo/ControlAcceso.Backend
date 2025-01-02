@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using ControlAcceso.Data.Roles;
 using Microsoft.AspNetCore.Mvc;
+using ControlAcceso.Data.Model;
 
 namespace ControlAcceso.Endpoints.Roles
 {
@@ -19,7 +20,7 @@ namespace ControlAcceso.Endpoints.Roles
         public IActionResult GetRoleList()
         {
             var roles = _roles?.SelectRole();
-            return Ok(new Response {Message = "OK", Roles=roles});
+            return Ok(new RoleResponse {Message = "OK", Roles=roles});
             
         }
 
@@ -36,5 +37,26 @@ namespace ControlAcceso.Endpoints.Roles
                 return BadRequest(new Response { Message = e.Message });
             }
         }
+
+        [HttpPatch("{id:int}")]
+        public IActionResult EditRole(int id, [FromBody] Request role)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(role.Name))
+                {
+                    return BadRequest(new Response{ Message = "El campo 'name' es obligatorio" });
+                }
+                
+                _roles?.UpdateRoleName(id, new RoleModel { Id = id, Name = role.Name });
+
+                return Ok(new Response { Message = "Rol actualizado exitosamente." });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new Response { Message = e.Message });
+            }
+        }
+
     }
 }
