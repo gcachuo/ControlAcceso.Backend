@@ -6,6 +6,7 @@ using ControlAcceso.Data.Addresses;
 using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Roles;
 using ControlAcceso.Data.Users;
+using ControlAcceso.Data.Packages;
 using ControlAcceso.Endpoints;
 using ControlAcceso.Services.DBService;
 using ControlAcceso.Tools.HttpContext;
@@ -29,7 +30,8 @@ namespace ControlAcceso
                 .AddScoped<IRefreshTokensDbContext, RefreshTokensDbContext>()
                 .AddScoped<IUsersDbContext, UsersDbContext>()
                 .AddScoped<IRolesDbContext, RolesDbContext>()
-                .AddScoped<IAddressesDbContext, AddressesDbContext>();
+                .AddScoped<IAddressesDbContext, AddressesDbContext>()
+                .AddScoped<IPackagesDbContext, PackagesDbContext>();
             
             // Inyectar la configuración para obtener el connection string
             builder.Services.AddTransient<IDbConnection>(sp =>

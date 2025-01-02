@@ -53,3 +53,13 @@ create table refresh_tokens
     user_agent   text,
     last_used_at timestamp
 );
+create table packages 
+(
+    id SERIAL PRIMARY KEY,
+    service VARCHAR NOT NULL,
+    received_at TIMESTAMP NOT NULL,
+    confirmed_at TIMESTAMP,
+    address_id INT NOT NULL,
+    status INT NOT NULL, 
+    CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(id)
+);
