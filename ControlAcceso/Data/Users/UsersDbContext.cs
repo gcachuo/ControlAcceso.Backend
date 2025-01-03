@@ -193,5 +193,23 @@ namespace ControlAcceso.Data.Users
             }
         }
 
+        public bool RoleExists(int roleId)
+        {
+            var query = @"
+                SELECT 1 
+                FROM Roles 
+                WHERE id = @RoleId";
+
+            var parameters = new Dictionary<string, dynamic>
+            {
+                { "@RoleId", roleId }
+            };
+
+            var result = DbService.ExecuteReader(query, parameters);
+
+            return result != null && result.Any();
+
+        }
+
     }
 }

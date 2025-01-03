@@ -150,8 +150,8 @@ namespace ControlAcceso.Endpoints.Users
                 {
                     return NotFound(new UserResponse { Message = "Usuario no encontrado" });
                 }
-
-                var roleExists = Users?.SelectUserList().Any(u => u.RoleId == request.IdRole);
+                
+                var roleExists = Users?.RoleExists(request.IdRole); 
                 if (!roleExists.GetValueOrDefault())
                 {
                     return BadRequest(new UserResponse { Message = "Rol no válido" });

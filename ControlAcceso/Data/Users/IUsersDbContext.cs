@@ -19,5 +19,8 @@ namespace ControlAcceso.Data.Users
         public void DisableUser(int idUser);
         
         public void UpdateUserRole(int idUser, int roleId);
+
+        public bool RoleExists(int roleId);
+
     }
 }
