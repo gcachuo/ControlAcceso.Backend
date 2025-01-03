@@ -170,5 +170,28 @@ namespace ControlAcceso.Tests.Endpoints
             Assert.Equal("Error al desactivar el usuario", ((UserDelete)result.Value).Message);
             _usersDbContext.Verify(db => db.DisableUser(userId), Times.Once);
         }
+
+        [Fact]
+        public void ChangeUserRole_ShouldReturnNotFound_WhenUserIdDoesNotExist()
+        {
+            // Arrange
+            const int nonExistentUserId = 999; 
+            var roleRequest = new RoleRequest { IdRole = 2 }; 
+
+            _usersDbContext.Setup(db => db.SelectUser(nonExistentUserId)).Returns((UserModel)null);
+
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object, _httpContext.Object);
+
+            // Act
+            var result = endpoint.ChangeUserRole(nonExistentUserId, roleRequest) as NotFoundObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, result.StatusCode);
+            Assert.Equal("Usuario no encontrado", ((UserResponse)result.Value).Message);
+
+            _usersDbContext.Verify(db => db.SelectUser(nonExistentUserId), Times.Once);
+        }
+
     }
 }

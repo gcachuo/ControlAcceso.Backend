@@ -31,4 +31,10 @@ namespace ControlAcceso.Endpoints.Users
         [JsonPropertyName("user_agent")]
         public string? UserAgent { get; set; }
     }
+
+    public class RoleRequest
+    {
+        public int IdRole { get; set; }
+    }
+
 }

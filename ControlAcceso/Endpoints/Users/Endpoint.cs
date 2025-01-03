@@ -140,6 +140,33 @@ namespace ControlAcceso.Endpoints.Users
                 return BadRequest(new UserDelete { Message = e.Message });
             }
         }
+        [HttpPatch("{idUser:int}/role")]
+        public IActionResult ChangeUserRole(int idUser, [FromBody] RoleRequest request)
+        {
+            try
+            {
+                var user = Users?.SelectUser(idUser);
+                if (user == null)
+                {
+                    return NotFound(new UserResponse { Message = "Usuario no encontrado" });
+                }
+
+                var roleExists = Users?.SelectUserList().Any(u => u.RoleId == request.IdRole);
+                if (!roleExists.GetValueOrDefault())
+                {
+                    return BadRequest(new UserResponse { Message = "Rol no válido" });
+                }
+
+                Users?.UpdateUserRole(idUser, request.IdRole);
+
+                return Ok(new UserResponse { Message = "Rol del usuario actualizado correctamente" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new UserResponse { Message = e.Message });
+            }
+        }
+
     }
 
     public partial class Endpoint

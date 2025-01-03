@@ -209,5 +209,36 @@ namespace ControlAcceso.Tests.Data
             
         }
 
+        [Fact]
+        public void UpdateUserRole_WhenValidParametersAreProvided()
+        {
+            // Arrange
+            const int userId = 1;
+            const int roleId = 2;
+
+            var dbServiceMock = new Mock<IDbService>();
+            dbServiceMock
+                .Setup(db => db.ExecuteNonQuery(
+                    It.Is<string>(query => query.Contains("UPDATE Users")),
+                    It.IsAny<Dictionary<string, object>>()
+                ))
+                .Verifiable();
+
+            var usersDbContext = new UsersDbContext(dbServiceMock.Object);
+
+            // Act
+            usersDbContext.UpdateUserRole(userId, roleId);
+
+            // Assert
+            dbServiceMock.Verify(db => db.ExecuteNonQuery(
+                It.Is<string>(query => query.Contains("UPDATE Users")),
+                It.Is<Dictionary<string, object>>(parameters =>
+                    (int)parameters["@IdUser"] == userId &&
+                    (int)parameters["@RoleId"] == roleId
+                )
+            ), Times.Once);
+        }
+
+
     }
 }
