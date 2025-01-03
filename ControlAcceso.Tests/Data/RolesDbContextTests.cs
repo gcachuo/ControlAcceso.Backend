@@ -188,7 +188,30 @@ namespace ControlAcceso.Tests.Data
             .WithMessage("Ya existe un rol con ese nombre.");
         }
 
+        [Fact]
+        public void RoleExists_ShouldReturnTrue_WhenRoleExists()
+        {
+            // Arrange
+            int roleId = 1;
+            var expectedResult = new List<Dictionary<string, object>>
+            {
+                new Dictionary<string, object> { { "Exists", 1 } }
+            };
 
+            // Mock
+            _dbServiceMock.Setup(x => x.ExecuteReader(
+                It.Is<string>(query => query.Contains("SELECT 1")), 
+                It.Is<Dictionary<string, object>>(parameters => (int)parameters["@RoleId"] == roleId)))
+                .Returns(expectedResult);  
+
+            var context = new RolesDbContext(_dbServiceMock.Object);
+
+            // Act
+            var result = context.RoleExists(roleId);
+
+            // Assert
+            Assert.True(result); 
+        }
 
     }
 }
