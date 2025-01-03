@@ -3,6 +3,7 @@ using ControlAcceso.Data.Model;
 using ControlAcceso.Data.RefreshTokens;
 using ControlAcceso.Data.Users;
 using ControlAcceso.Endpoints.Users;
+using ControlAcceso.Data.Roles;
 using ControlAcceso.Tools;
 using ControlAcceso.Tools.HttpContext;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ namespace ControlAcceso.Tests.Endpoints
         private readonly Mock<IUsersDbContext> _usersDbContext = new(MockBehavior.Strict);
         private readonly Mock<IRefreshTokensDbContext> _refreshTokensDbContext = new(MockBehavior.Strict);
         private readonly Mock<IHttpContext> _httpContext = new(MockBehavior.Strict);
+        private readonly Mock<IRolesDbContext> _rolesDbContext = new(MockBehavior.Strict);
 
 
         [Fact]
@@ -30,7 +32,7 @@ namespace ControlAcceso.Tests.Endpoints
             _usersDbContext.Setup(x => x.InsertUser(It.IsAny<UserModel>()));
 
             //Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.RegisterUser(request) as ObjectResult;
             ;
 
@@ -49,7 +51,7 @@ namespace ControlAcceso.Tests.Endpoints
             _usersDbContext.Setup(x => x.InsertUser(It.IsAny<UserModel>())).Throws<DataException>(() => new("Usuario duplicado."));
 
             //Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.RegisterUser(request) as ObjectResult;
             ;
 
@@ -74,7 +76,7 @@ namespace ControlAcceso.Tests.Endpoints
 
 
             //Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.EditUser(idUser, request) as ObjectResult;
 
             //Assert
@@ -95,7 +97,7 @@ namespace ControlAcceso.Tests.Endpoints
             _usersDbContext.Setup(x => x.SelectUser(idUser)).Returns(new UserModel());
 
             //Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.GetUser(idUser) as ObjectResult;
 
             //Assert
@@ -127,7 +129,7 @@ namespace ControlAcceso.Tests.Endpoints
                 .Setup(x => x.InsertToken(It.IsAny<string>(), 1, "8.8.8.8", userAgent));
 
             //Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.LoginUser(loginRequest) as ObjectResult;
 
             //Assert
@@ -143,7 +145,7 @@ namespace ControlAcceso.Tests.Endpoints
             _usersDbContext.Setup(db => db.DisableUser(userId)).Verifiable();
 
             // Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.DeleteUser(userId) as OkObjectResult;
 
             // Assert
@@ -161,7 +163,7 @@ namespace ControlAcceso.Tests.Endpoints
             _usersDbContext.Setup(db => db.DisableUser(userId)).Throws(new DataException("Error al desactivar el usuario"));
 
             // Act
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object,_httpContext.Object,_rolesDbContext.Object);
             var result = endpoint.DeleteUser(userId) as BadRequestObjectResult;
 
             // Assert
@@ -180,7 +182,7 @@ namespace ControlAcceso.Tests.Endpoints
 
             _usersDbContext.Setup(db => db.SelectUser(nonExistentUserId)).Returns((UserModel)null);
 
-            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object, _httpContext.Object);
+            var endpoint = new Endpoint(_usersDbContext.Object, _refreshTokensDbContext.Object, _httpContext.Object,_rolesDbContext.Object);
 
             // Act
             var result = endpoint.ChangeUserRole(nonExistentUserId, roleRequest) as NotFoundObjectResult;

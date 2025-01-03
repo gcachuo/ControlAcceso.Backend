@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using ControlAcceso.Data.Users;
+using ControlAcceso.Data.Roles;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 using ControlAcceso.Data.Model;
@@ -20,11 +21,15 @@ namespace ControlAcceso.Endpoints.Users
         private IRefreshTokensDbContext? RefreshTokens { get; }
         private IHttpContext? _httpContext { get; }
 
-        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext)
+        private IRolesDbContext? Roles { get; }
+
+
+        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext,IRolesDbContext? roles)
         {
             Users = users;
             RefreshTokens = refreshTokens;
             _httpContext = httpContext;
+            Roles = roles;
         }
 
         [HttpGet]
@@ -150,8 +155,8 @@ namespace ControlAcceso.Endpoints.Users
                 {
                     return NotFound(new UserResponse { Message = "Usuario no encontrado" });
                 }
-                
-                var roleExists = Users?.RoleExists(request.IdRole); 
+
+                var roleExists = Roles?.RoleExists(request.IdRole); 
                 if (!roleExists.GetValueOrDefault())
                 {
                     return BadRequest(new UserResponse { Message = "Rol no válido" });
