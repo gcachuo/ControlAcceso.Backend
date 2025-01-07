@@ -10,4 +10,6 @@ public interface IRolesDbContext
     
     public void UpdateRoleName(int id,RoleModel role);
 
+    public bool RoleExists(int roleId);
+    
 }

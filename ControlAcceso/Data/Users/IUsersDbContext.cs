@@ -17,5 +17,8 @@ namespace ControlAcceso.Data.Users
         public List<UserModel> SelectUserList();
 
         public void DisableUser(int idUser);
+        
+        public void UpdateUserRole(int idUser, int roleId);
+
     }
 }

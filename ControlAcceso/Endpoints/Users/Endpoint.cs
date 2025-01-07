@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using ControlAcceso.Data.Users;
+using ControlAcceso.Data.Roles;
 using ControlAcceso.Tools;
 using Microsoft.AspNetCore.Mvc;
 using ControlAcceso.Data.Model;
@@ -20,11 +21,15 @@ namespace ControlAcceso.Endpoints.Users
         private IRefreshTokensDbContext? RefreshTokens { get; }
         private IHttpContext? _httpContext { get; }
 
-        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext)
+        private IRolesDbContext? Roles { get; }
+
+
+        public Endpoint(IUsersDbContext? users, IRefreshTokensDbContext? refreshTokens, IHttpContext? httpContext,IRolesDbContext? roles)
         {
             Users = users;
             RefreshTokens = refreshTokens;
             _httpContext = httpContext;
+            Roles = roles;
         }
 
         [HttpGet]
@@ -140,6 +145,33 @@ namespace ControlAcceso.Endpoints.Users
                 return BadRequest(new UserDelete { Message = e.Message });
             }
         }
+        [HttpPatch("{idUser:int}/role")]
+        public IActionResult ChangeUserRole(int idUser, [FromBody] RoleRequest request)
+        {
+            try
+            {
+                var user = Users?.SelectUser(idUser);
+                if (user == null)
+                {
+                    return NotFound(new UserResponse { Message = "Usuario no encontrado" });
+                }
+
+                var roleExists = Roles?.RoleExists(request.IdRole); 
+                if (!roleExists.GetValueOrDefault())
+                {
+                    return BadRequest(new UserResponse { Message = "Rol no válido" });
+                }
+
+                Users?.UpdateUserRole(idUser, request.IdRole);
+
+                return Ok(new UserResponse { Message = "Rol del usuario actualizado correctamente" });
+            }
+            catch (DataException e)
+            {
+                return BadRequest(new UserResponse { Message = e.Message });
+            }
+        }
+
     }
 
     public partial class Endpoint

@@ -171,5 +171,27 @@ namespace ControlAcceso.Data.Users
             var updateQuery = "UPDATE Users SET enabled = FALSE WHERE id = @IdUser";
             DbService.ExecuteNonQuery(updateQuery, new() { { "@IdUser", idUser } });
         }
+
+        public void UpdateUserRole(int idUser, int roleId)
+        {
+            try
+            {
+                var updateQuery = @"
+                    UPDATE Users
+                    SET role_id = @RoleId
+                    WHERE id = @IdUser";
+
+                DbService.ExecuteNonQuery(updateQuery, new()
+                {
+                    { "@IdUser", idUser },
+                    { "@RoleId", roleId }
+                });
+            }
+            catch (PostgresException e)
+            {
+                throw new DataException("Error al actualizar el rol del usuario.", e);
+            }
+        }
+
     }
 }
