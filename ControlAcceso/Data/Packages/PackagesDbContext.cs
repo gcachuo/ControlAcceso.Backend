@@ -16,7 +16,17 @@ namespace ControlAcceso.Data.Packages
 
         public List<PackageModel> SelectPackages()
         {
-            var rows = DbService.ExecuteReader("SELECT * FROM packages WHERE status = 0", new Dictionary<string, dynamic>());
+            var rows = DbService.ExecuteReader("""
+                SELECT packages.*,
+                    CASE
+                        WHEN packages.status = 0 THEN 'recibido'
+                        ELSE 'confirmado'
+                    END as status_name,
+                    CONCAT(addresses.street, ' #', addresses."number") as address
+                FROM packages
+                INNER JOIN addresses ON addresses.id = packages.address_id;
+                """, new Dictionary<string, dynamic>());
+
             var packages = new List<PackageModel>();
 
             foreach (var row in rows)
@@ -28,7 +38,9 @@ namespace ControlAcceso.Data.Packages
                     ReceivedAt = Convert.ToDateTime(row["received_at"]),
                     ConfirmedAt = row["confirmed_at"] != null ? Convert.ToDateTime(row["confirmed_at"]) : null,
                     AddressId = Convert.ToInt32(row["address_id"]),
-                    Status = Convert.ToInt32(row["status"])
+                    Status = Convert.ToInt32(row["status"]),
+                    StatusName = row["status_name"]?.ToString(),
+                    Address = row["address"]?.ToString(),
                 });
             }
 

@@ -30,8 +30,10 @@ namespace ControlAcceso.Tests
                     { "service", "Delivery" },
                     { "received_at", DateTime.Now },
                     { "confirmed_at", null },
-                    { "address_id", 101 },
-                    { "status", 0 }
+                    { "address_id", 1 },
+                    { "status", 1 },
+                    { "address", "Fake street 1" },
+                    { "status_name", "confirmado" }
                 },
                 new Dictionary<string, object>
                 {
@@ -39,8 +41,10 @@ namespace ControlAcceso.Tests
                     { "service", "Pickup" },
                     { "received_at", DateTime.Now },
                     { "confirmed_at", null },
-                    { "address_id", 102 },
-                    { "status", 0 }
+                    { "address_id", 2 },
+                    { "status", 0 },
+                    { "address", "Fake street 2" },
+                    { "status_name", "recibido" }
                 }
             };
 
@@ -55,7 +59,7 @@ namespace ControlAcceso.Tests
             Assert.Equal(2, result.Count);
             Assert.Equal(1, result[0].Id);
             Assert.Equal("Delivery", result[0].Service);
-            Assert.Equal(101, result[0].AddressId);
+            Assert.Equal(1, result[0].AddressId);
         }
 
         [Fact]
