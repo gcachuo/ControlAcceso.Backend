@@ -19,10 +19,10 @@ namespace ControlAcceso.Tests.Endpoints
         public void Should_Get_Permissions_Successfully()
         {
             // Arrange
-            var expectedPermissions = new List<GroupedPermission>
+            var expectedPermissions = new Dictionary<string, List<string>>
             {
-                new GroupedPermission { Entity = "Entity1", Permissions = new List<string> { "Read", "Write" } },
-                new GroupedPermission { Entity = "Entity2", Permissions = new List<string> { "Execute" } }
+                {"Entity1",new List<string>(){ "Read", "Write" } },
+                { "Entity2", new List<string> { "Execute" } }
             };
 
             _mockPermissionsDbContext.Setup(x => x.GetGroupedPermissions(It.IsAny<int>(), It.IsAny<int>()))
@@ -47,7 +47,7 @@ namespace ControlAcceso.Tests.Endpoints
         {
             // Arrange
             _mockPermissionsDbContext.Setup(x => x.GetGroupedPermissions(It.IsAny<int>(), It.IsAny<int>()))
-                                      .Returns(new List<GroupedPermission>());
+                                      .Returns(new Dictionary<string, List<string>>());
 
             var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_mockRolesDbContext.Object, _mockPermissionsDbContext.Object);
 

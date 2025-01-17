@@ -18,7 +18,7 @@ namespace ControlAcceso.Tests
         }
 
         [Fact]
-        public void GetGroupedPermissions_ReturnsListOfGroupedPermissions()
+        public void GetGroupedPermissions_ReturnsDictionaryOfPermissions()
         {
             // Arrange
             var mockData = new List<Dictionary<string, object>>
@@ -31,7 +31,7 @@ namespace ControlAcceso.Tests
                 new Dictionary<string, object>
                 {
                     { "entity", "Entity2" },
-                    { "permissions", new[] { "Execute" } }
+                    { "permissions", new[] { "Delete" } }
                 }
             };
 
@@ -44,13 +44,15 @@ namespace ControlAcceso.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
-            Assert.Equal("Entity1", result[0].Entity);
-            Assert.Contains("Read", result[0].Permissions);
-            Assert.Contains("Write", result[0].Permissions);
+            Assert.True(result.ContainsKey("Entity1"));
+            Assert.Contains("Read", result["Entity1"]);
+            Assert.Contains("Write", result["Entity1"]);
+            Assert.True(result.ContainsKey("Entity2"));
+            Assert.Contains("Delete", result["Entity2"]);
         }
 
         [Fact]
-        public void GetGroupedPermissions_ReturnsEmptyList_WhenNoPermissions()
+        public void GetGroupedPermissions_ReturnsEmptyDictionary_WhenNoPermissions()
         {
             // Arrange
             _mockDbService.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
@@ -68,15 +70,11 @@ namespace ControlAcceso.Tests
         public void GetGroupedPermissions_HandlesException_Gracefully()
         {
             // Arrange
-            var mockDbService = new Mock<IDbService>();
-
-            mockDbService.Setup(db => db.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>() ))
-                        .Throws(new PostgresException("Database connection failed", "Severity", "InvariantSeverity", "SqlState"));
-
-            var dbContext = new PermissionsDbContext(mockDbService.Object);
+            _mockDbService.Setup(db => db.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
+                          .Throws(new PostgresException("Database connection failed", "Severity", "InvariantSeverity", "SqlState"));
 
             // Act & Assert
-            var exception = Assert.Throws<PostgresException>(() => dbContext.GetGroupedPermissions(1, 1));
+            var exception = Assert.Throws<PostgresException>(() => _dbContext.GetGroupedPermissions(1, 1));
 
             Assert.Equal("SqlState: Database connection failed", exception.Message);
         }
