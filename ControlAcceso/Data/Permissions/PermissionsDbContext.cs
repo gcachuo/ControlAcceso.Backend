@@ -39,7 +39,7 @@ namespace ControlAcceso.Data.Permissions
             var groupedPermissions = rows.Select(row => new GroupedPermission
             {
                 Entity = row["entity"]?.ToString()!,
-                Permissions = ((IEnumerable<object>)row["permissions"]!)
+                Permissions = ((List<string>)row["permissions"]!)
                                 .Select(permission => permission.ToString()!)
                                 .ToList()
             }).ToList();

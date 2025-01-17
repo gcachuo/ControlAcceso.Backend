@@ -25,18 +25,18 @@ namespace ControlAcceso.Tests
             {
                 new Dictionary<string, object>
                 {
-                    { "entity", "Entity1" },
-                    { "permissions", new[] { "Read", "Write" } }
+                    { "entity", "users" }, 
+                    { "permissions", new List<string> { "Read", "Write" } }
                 },
                 new Dictionary<string, object>
                 {
-                    { "entity", "Entity2" },
-                    { "permissions", new[] { "Delete" } }
+                    { "entity", "package" }, 
+                    { "permissions", new List<string> { "Delete" } }
                 }
             };
 
-            _mockDbService.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
-                          .Returns(mockData);
+            _mockDbService.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>() ))
+                        .Returns(mockData);
 
             // Act
             var result = _dbContext.GetGroupedPermissions(1, 1);
@@ -44,12 +44,16 @@ namespace ControlAcceso.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
-            Assert.True(result.ContainsKey("Entity1"));
-            Assert.Contains("Read", result["Entity1"]);
-            Assert.Contains("Write", result["Entity1"]);
-            Assert.True(result.ContainsKey("Entity2"));
-            Assert.Contains("Delete", result["Entity2"]);
+
+            Assert.True(result.ContainsKey("users"));
+            Assert.Contains("Read", (List<string>)result["users"]);
+            Assert.Contains("Write", (List<string>)result["users"]);
+
+            Assert.True(result.ContainsKey("package"));
+            Assert.Contains("Delete", (List<string>)result["package"]);
         }
+
+
 
         [Fact]
         public void GetGroupedPermissions_ReturnsEmptyDictionary_WhenNoPermissions()

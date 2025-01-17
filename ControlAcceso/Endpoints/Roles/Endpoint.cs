@@ -63,22 +63,14 @@ namespace ControlAcceso.Endpoints.Roles
         [HttpGet("{idRole}/nodes/{idUser}")]
         public IActionResult GetPermissions(int idRole, int idUser)
         {
-            try
-            {
-                var groupedPermissions = _permissions?.GetGroupedPermissions(idRole, idUser);
+            var groupedPermissions = _permissions?.GetGroupedPermissions(idRole, idUser);
 
                 if (groupedPermissions == null || !groupedPermissions.Any())
                 {
                     return NotFound(new PermissionsResponse { Message = "No se encontraron permisos.", Permissions = new Dictionary<string, List<string>>() });
                 }
 
-                return Ok(new PermissionsResponse { Message = "OK", Permissions = groupedPermissions });
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { Message = e.Message });
-            }
+                return Ok(new PermissionsResponse { Message = "OK", Permissions = groupedPermissions });         
         }
-
     }
 }
