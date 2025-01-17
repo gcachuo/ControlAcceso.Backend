@@ -12,6 +12,7 @@ using ControlAcceso.Services.DBService;
 using ControlAcceso.Tools.HttpContext;
 using Microsoft.AspNetCore.Diagnostics;
 using Npgsql;
+using ControlAcceso.Data.Permissions;
 
 namespace ControlAcceso
 {
@@ -31,8 +32,8 @@ namespace ControlAcceso
                 .AddScoped<IUsersDbContext, UsersDbContext>()
                 .AddScoped<IRolesDbContext, RolesDbContext>()
                 .AddScoped<IAddressesDbContext, AddressesDbContext>()
-                .AddScoped<IPackagesDbContext, PackagesDbContext>();
-            
+                .AddScoped<IPackagesDbContext, PackagesDbContext>()
+                .AddScoped<IPermissionsDbContext, PermissionsDbContext>();
             // Inyectar la configuración para obtener el connection string
             builder.Services.AddTransient<IDbConnection>(sp =>
             {
