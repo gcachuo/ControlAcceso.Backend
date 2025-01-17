@@ -13,7 +13,7 @@ namespace ControlAcceso.Data.Permissions
             DbService = dbService;
         }
 
-        public List<GroupedPermission> GetGroupedPermissions(int roleId, int userId)
+        public Dictionary<string,List<string>> GetGroupedPermissions(int roleId, int userId)
         {
             var query = @"
                 SELECT entity, ARRAY_AGG(DISTINCT permission) AS permissions
@@ -36,13 +36,19 @@ namespace ControlAcceso.Data.Permissions
 
             var rows = DbService.ExecuteReader(query, parameters);
 
-            return rows.Select(row => new GroupedPermission
+            var groupedPermissions = rows.Select(row => new GroupedPermission
             {
                 Entity = row["entity"]?.ToString()!,
                 Permissions = ((IEnumerable<object>)row["permissions"]!)
                                 .Select(permission => permission.ToString()!)
                                 .ToList()
             }).ToList();
+
+            // Convertir al primer modelo (diccionario)
+            var flatPermissions = groupedPermissions
+                .ToDictionary(gp => gp.Entity, gp => gp.Permissions);
+
+            return flatPermissions;    
         }
     }
 }

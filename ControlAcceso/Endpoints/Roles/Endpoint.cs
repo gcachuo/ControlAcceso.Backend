@@ -69,7 +69,7 @@ namespace ControlAcceso.Endpoints.Roles
 
                 if (groupedPermissions == null || !groupedPermissions.Any())
                 {
-                    return NotFound(new PermissionsResponse { Message = "No se encontraron permisos.", Permissions = new List<GroupedPermission>() });
+                    return NotFound(new PermissionsResponse { Message = "No se encontraron permisos.", Permissions = new Dictionary<string, List<string>>() });
                 }
 
                 return Ok(new PermissionsResponse { Message = "OK", Permissions = groupedPermissions });

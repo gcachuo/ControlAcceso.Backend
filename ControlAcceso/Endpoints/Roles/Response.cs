@@ -17,7 +17,7 @@ namespace ControlAcceso.Endpoints.Roles
     public class PermissionsResponse:IResponse
     {
         public string? Message {get; set;}
-        public List<GroupedPermission>? Permissions { get; set; }
+        public Dictionary<string,List<string>>? Permissions { get; set; }
 
     }
 }
