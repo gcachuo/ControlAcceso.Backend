@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using ControlAcceso.Data.Roles;
+using ControlAcceso.Data.Permissions;
 using Microsoft.AspNetCore.Mvc;
 using ControlAcceso.Data.Model;
 
@@ -10,10 +11,12 @@ namespace ControlAcceso.Endpoints.Roles
     public class Endpoint : ControllerBase
     {
         private IRolesDbContext? _roles { get; }
-        
-        public Endpoint(IRolesDbContext? roles)
+        private IPermissionsDbContext? _permissions { get; }
+
+        public Endpoint(IRolesDbContext? roles, IPermissionsDbContext? permissions)
         {
             _roles = roles;
+            _permissions = permissions;
         }
 
         [HttpGet]
@@ -57,6 +60,17 @@ namespace ControlAcceso.Endpoints.Roles
                 return BadRequest(new Response { Message = e.Message });
             }
         }
+        [HttpGet("{idRole}/nodes/{idUser}")]
+        public IActionResult GetPermissions(int idRole, int idUser)
+        {
+            var groupedPermissions = _permissions?.GetGroupedPermissions(idRole, idUser);
 
+                if (groupedPermissions == null || !groupedPermissions.Any())
+                {
+                    return NotFound(new PermissionsResponse { Message = "No se encontraron permisos.", Permissions = new Dictionary<string, List<string>>() });
+                }
+
+                return Ok(new PermissionsResponse { Message = "OK", Permissions = groupedPermissions });         
+        }
     }
 }

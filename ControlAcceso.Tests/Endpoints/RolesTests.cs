@@ -1,5 +1,6 @@
 ﻿using ControlAcceso.Data.Model;
 using ControlAcceso.Data.Roles;
+using ControlAcceso.Data.Permissions;
 using ControlAcceso.Endpoints.Roles;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +12,8 @@ namespace ControlAcceso.Tests.Endpoints
 {
     public class RolesTests
     {
-        private readonly Mock<IRolesDbContext> _dbContextMock = new(MockBehavior.Strict);
+        private readonly Mock<IPermissionsDbContext> _mockPermissionsDbContext = new(MockBehavior.Strict);
+        private readonly Mock<IRolesDbContext> _mockRolesdbContext = new(MockBehavior.Strict);
 
         [Fact]
         public void Should_Create_Role_Successfully()
@@ -20,11 +22,11 @@ namespace ControlAcceso.Tests.Endpoints
             var request = new Request { Name = "Test" };
 
             //Mock
-            _dbContextMock
+            _mockRolesdbContext
                 .Setup(x => x.InsertRole(It.IsAny<RoleModel>()));
 
             //Act
-            var endpoint = new Endpoint(_dbContextMock.Object);
+            var endpoint = new Endpoint(_mockRolesdbContext.Object, _mockPermissionsDbContext.Object);
             var result = endpoint.CreateRole(request) as ObjectResult;
 
             //Assert
@@ -44,10 +46,10 @@ namespace ControlAcceso.Tests.Endpoints
                 new RoleModel { Name = "User" }
             };
 
-            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+            _mockRolesdbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
 
             // Act
-            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var endpoint = new Endpoint(_mockRolesdbContext.Object, _mockPermissionsDbContext.Object);
             var result = endpoint.GetRoleList() as ObjectResult;
 
             // Assert
@@ -62,10 +64,10 @@ namespace ControlAcceso.Tests.Endpoints
             // Arrange
             var mockRoles = new List<RoleModel>(); 
 
-            _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
+            _mockRolesdbContext.Setup(x => x.SelectRole()).Returns(mockRoles);
 
             // Act
-            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var endpoint = new Endpoint(_mockRolesdbContext.Object, _mockPermissionsDbContext.Object);
             var result = endpoint.GetRoleList() as ObjectResult;
 
             // Assert
@@ -87,7 +89,7 @@ namespace ControlAcceso.Tests.Endpoints
             _rolesDbContext.Setup(x => x.UpdateRoleName(It.IsAny<int>(), It.IsAny<RoleModel>()));
 
             // Act
-            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var endpoint = new Endpoint(_rolesDbContext.Object,_mockPermissionsDbContext.Object);
             var result = endpoint.EditRole(1, request) as ObjectResult;
 
             // Assert
@@ -106,7 +108,7 @@ namespace ControlAcceso.Tests.Endpoints
             _rolesDbContext.Setup(x => x.SelectRole()).Returns(mockRoles); 
 
             // Act
-            var endpoint = new ControlAcceso.Endpoints.Roles.Endpoint(_rolesDbContext.Object);
+            var endpoint = new Endpoint(_rolesDbContext.Object,_mockPermissionsDbContext.Object);
             var result = endpoint.EditRole(1, request) as ObjectResult;
 
             // Assert

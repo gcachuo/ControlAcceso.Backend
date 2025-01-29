@@ -61,5 +61,22 @@ create table packages
     confirmed_at TIMESTAMP,
     address_id INT NOT NULL,
     status INT NOT NULL, 
-    CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES addresses(id)
+    CONSTRAINT fk_address 
+    FOREIGN KEY (address_id) REFERENCES addresses(id)
+);
+create table role_permissions (
+    id SERIAL PRIMARY KEY,
+    role_id INTEGER NOT NULL
+        CONSTRAINT fk_role_permission_role 
+        REFERENCES roles(id) ON DELETE CASCADE,
+    entity VARCHAR NOT NULL,
+    permission VARCHAR NOT NULL
+);
+create table user_permissions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL
+        CONSTRAINT fk_user_permission_user 
+        REFERENCES users(id) ON DELETE CASCADE,
+    entity VARCHAR NOT NULL,
+    permission VARCHAR NOT NULL
 );
