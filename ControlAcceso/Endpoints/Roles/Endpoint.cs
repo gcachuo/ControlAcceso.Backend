@@ -72,5 +72,12 @@ namespace ControlAcceso.Endpoints.Roles
 
                 return Ok(new PermissionsResponse { Message = "OK", Permissions = groupedPermissions });         
         }
+        [HttpGet("{idRole}/nodes")]
+        public IActionResult GetRolePermissions(int idRole)
+        {
+            var permissions = _permissions?.GetRolePermissions(idRole);
+            return Ok(new PermissionsResponse {Message = "OK", Permissions=permissions});
+            
+        }
     }
 }

@@ -18,42 +18,64 @@ namespace ControlAcceso.Tests
         }
 
         [Fact]
-        public void GetGroupedPermissions_ReturnsDictionaryOfPermissions()
+        public void GetGroupedPermissions_ShouldReturnPermissions_WhenDataExists()
         {
             // Arrange
+            var roleId = 1;
+            var userId = 2;
+            
             var mockData = new List<Dictionary<string, object>>
             {
                 new Dictionary<string, object>
                 {
-                    { "entity", "users" }, 
-                    { "permissions", new List<string> { "Read", "Write" } }
+                    { "entity", "Users" },
+                    { "permissions", new string[] { "Read", "Write" } }
                 },
                 new Dictionary<string, object>
                 {
-                    { "entity", "package" }, 
-                    { "permissions", new List<string> { "Delete" } }
+                    { "entity", "Orders" },
+                    { "permissions", new string[] { "Execute" } }
                 }
             };
 
-            _mockDbService.Setup(x => x.ExecuteReader(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>() ))
-                        .Returns(mockData);
+            _mockDbService.Setup(db => db.ExecuteReader(
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()
+            )).Returns(mockData);
 
             // Act
-            var result = _dbContext.GetGroupedPermissions(1, 1);
+            var result = _dbContext.GetGroupedPermissions(roleId, userId);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
 
-            Assert.True(result.ContainsKey("users"));
-            Assert.Contains("Read", (List<string>)result["users"]);
-            Assert.Contains("Write", (List<string>)result["users"]);
+            Assert.True(result.ContainsKey("Users"));
+            Assert.Equal(new List<string> { "Read", "Write" }, result["Users"]);
 
-            Assert.True(result.ContainsKey("package"));
-            Assert.Contains("Delete", (List<string>)result["package"]);
+            Assert.True(result.ContainsKey("Orders"));
+            Assert.Equal(new List<string> { "Execute" }, result["Orders"]);
         }
 
+        [Fact]
+        public void GetGroupedPermissions_ShouldReturnEmptyDictionary_WhenNoDataExists()
+        {
+            // Arrange
+            var roleId = 3;
+            var userId = 4;
 
+            _mockDbService.Setup(db => db.ExecuteReader(
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()
+            )).Returns(new List<Dictionary<string, object>>());
+
+            // Act
+            var result = _dbContext.GetGroupedPermissions(roleId, userId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
 
         [Fact]
         public void GetGroupedPermissions_ReturnsEmptyDictionary_WhenNoPermissions()
@@ -81,6 +103,60 @@ namespace ControlAcceso.Tests
             var exception = Assert.Throws<PostgresException>(() => _dbContext.GetGroupedPermissions(1, 1));
 
             Assert.Equal("SqlState: Database connection failed", exception.Message);
+        }
+
+        [Fact]
+        public void GetRolePermissions_ShouldReturnGroupedPermissions_WhenDataExists()
+        {
+            // Arrange
+            var roleId = 1;
+            var mockData = new List<Dictionary<string, object>>
+            {
+                new Dictionary<string, object>
+                {
+                    { "entity", "Users" },
+                    { "permissions", new string[] { "Read", "Write" } }
+                },
+                new Dictionary<string, object>
+                {
+                    { "entity", "Orders" },
+                    { "permissions", new string[] { "Execute" } }
+                }
+            };
+
+            _mockDbService.Setup(db => db.ExecuteReader(
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()
+            )).Returns(mockData);
+
+            // Act
+            var result = _dbContext.GetRolePermissions(roleId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.True(result.ContainsKey("Users"));
+            Assert.Equal(new List<string> { "Read", "Write" }, result["Users"]);
+            Assert.True(result.ContainsKey("Orders"));
+            Assert.Equal(new List<string> { "Execute" }, result["Orders"]);
+        }
+
+        [Fact]
+        public void GetRolePermissions_ShouldReturnEmptyDictionary_WhenNoDataExists()
+        {
+            // Arrange
+            var roleId = 2;
+            _mockDbService.Setup(db => db.ExecuteReader(
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, dynamic>>()
+            )).Returns(new List<Dictionary<string, object>>());
+
+            // Act
+            var result = _dbContext.GetRolePermissions(roleId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
     }
 }

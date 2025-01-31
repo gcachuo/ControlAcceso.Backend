@@ -1,6 +1,8 @@
-namespace ControlAcceso.Data.Model;
-public class GroupedPermission
+namespace ControlAcceso.Data.Model
 {
-    public string Entity { get; set; } = string.Empty;
-    public List<string> Permissions { get; set; } = new();
+    public class PermissionModel
+    {
+        public string Entity { get; set; } = string.Empty;
+        public List<string> Permissions { get; set; } = new();
+    }
 }
