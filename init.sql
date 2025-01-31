@@ -72,11 +72,3 @@ create table role_permissions (
     entity VARCHAR NOT NULL,
     permission VARCHAR NOT NULL
 );
-create table user_permissions (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL
-        CONSTRAINT fk_user_permission_user 
-        REFERENCES users(id) ON DELETE CASCADE,
-    entity VARCHAR NOT NULL,
-    permission VARCHAR NOT NULL
-);
